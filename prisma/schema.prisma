@@ -1,0 +1,237 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
+  output   = "../src/generated/type-graphql"
+  emitTranspiledCode = true
+  // simpleResolvers = true
+}
+
+model User {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  email     String  @unique
+  isEmailVerified Boolean @default(false)
+  mobile    String  @unique
+  isMobileVerified Boolean @default(false)  
+
+  firstName String?
+  lastName  String? 
+  image     String?
+  profiles Profile[] 
+  
+  aadhaar   Doc?
+  panCard Doc?
+  aadhaarMobile    String?  @unique
+  address Address[]
+  contacts ContactNumber[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+} 
+
+
+model Profile{
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  profileType BussinessType
+  role Role
+  status UserStatus // owner verification pending, invited, active, otp verification pending, blocked
+
+  // user profile relatioship 1-M
+  userId String @db.ObjectId
+  user  User @relation(fields: [userId], references: [id])
+
+  // profile bussiness relatioship M-M
+  bussinessIDs String[] @db.ObjectId  
+  bussiness Bussiness[] @relation(fields: [bussinessIDs], references: [id])
+
+  // profile bussinessUnit relatioship M-M
+  bussinessUnitIDs String[] @db.ObjectId  
+  bussinessUnits BussinessUnit[] @relation(fields: [bussinessUnitIDs], references: [id])
+
+  // user Invited by 
+  invitatedById String? @db.ObjectId
+  invitatedBy Profile? @relation("invitations",fields: [invitatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  createdInvitations Profile[] @relation("invitations")
+  createdBussiness Bussiness[] @relation("bussiness")
+  craetedBussinessUnits BussinessUnit[] @relation("bussinessUnits")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bussiness {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+
+  GSTIN String
+  LeagalName String @unique
+  displayName String @unique
+  description String?
+  image String?
+  dateOfIncorporation DateTime?
+  constitution String?
+  address Address?
+  contactInfo contactInfo?
+  status BussinessStatus
+
+  profileIds String[] @db.ObjectId
+  userProfiles Profile[] @relation(fields: [profileIds], references: [id])
+  
+  paymentSubscription PaymentSubscription[] 
+  BussinessUnits BussinessUnit[]
+
+  createdById String @db.ObjectId
+  createdBy Profile @relation( "bussiness", fields: [createdById], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+// branch/warehouse/sub entity
+model BussinessUnit {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String?
+  image String?
+
+  bussinessUnitType BussinessUnitType
+
+  address Address?
+  contactInfo contactInfo?
+  status BussinessStatus
+
+  profileIds String[] @db.ObjectId
+  userProfiles Profile[] @relation(fields: [profileIds], references: [id])
+
+  bussinessId String @db.ObjectId
+  bussiness Bussiness @relation(fields: [bussinessId], references: [id])
+
+  createdById String @db.ObjectId
+  createdBy Profile @relation( "bussinessUnits", fields: [createdById], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentSubscription{
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  bussinessId String @db.ObjectId
+  bussiness Bussiness @relation(fields: [bussinessId], references: [id])
+  subscriptionId String @db.ObjectId
+  lastSubscriptionType SubscriptionType? @relation(fields: [subscriptionId], references: [id])
+  status SubscriptionStatus
+  expiryDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SubscriptionType {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String?
+  price String?
+  count Int?
+  PaymentSubscriptions PaymentSubscription[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type  ContactNumber{
+  type String
+  number String
+  isVerified Boolean @default(false)
+}
+
+type Address {
+  type String
+  addressLine1 String
+  addressLine2 String?
+  city String
+  state String
+  country String
+  pincode String
+  isPrimary Boolean @default(false)
+}
+
+type Doc {
+  image String?
+  number String
+  isVerified Boolean @default(false)
+}
+
+type contactInfo {
+  contact ContactNumber[]
+  socialMedia SocialMedia?
+  email String?
+  website String?
+  latitude String?
+  longitude String?
+}
+
+type SocialMedia {
+  facebook String?
+  twitter String?
+  instagram String?
+  linkedin String?
+  googlePlus String?
+  youtube String?
+}
+
+enum BussinessType {
+  QC
+  Listing
+}
+
+enum BussinessUnitType {
+  Branch
+  Warehouse
+  SubEntity
+}
+
+enum UserStatus {
+  active
+  blocked
+  invited
+  ownerVerificationPending
+  otpVerificationPending
+}
+
+enum BussinessStatus {
+  Active 
+  Deleted 
+  Approved 
+  Rejected 
+  Blocked   
+  Draft 
+  Pending  
+  Closed 
+  Inactive
+}
+
+enum SubscriptionStatus {
+  Active 
+  Deleted 
+  Pending  
+  Closed 
+  Inactive
+}
+
+enum Role {
+  ListingOwner
+  ListingManager
+  ListingAgent
+  ListingUser
+  QCOwner
+  QCUser
+  QCManager
+  QCAnalysit
+  QCApprover 
+}
