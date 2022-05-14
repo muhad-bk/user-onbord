@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedIndexes", "fullTextIndex"]
 }
 
 datasource db {
@@ -11,178 +12,201 @@ datasource db {
 }
 
 generator typegraphql {
-  provider = "typegraphql-prisma"
-  output   = "../src/generated/type-graphql"
+  provider           = "typegraphql-prisma"
+  output             = "../src/generated/type-graphql"
   emitTranspiledCode = true
-  // simpleResolvers = true
+  simpleResolvers    = true
 }
 
 model User {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  email     String  @unique
-  isEmailVerified Boolean @default(false)
-  mobile    String  @unique
-  isMobileVerified Boolean @default(false)  
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  email            String?
+  isEmailVerified  Boolean @default(false)
+  mobile           String
+  isMobileVerified Boolean @default(false)
 
   firstName String?
-  lastName  String? 
+  lastName  String?
   image     String?
-  profiles Profile[] 
-  
-  aadhaar   Doc?
-  panCard Doc?
-  aadhaarMobile    String?  @unique
-  address Address[]
+
+  //** user have multiple profile */
+  Profiles  Profile[]
+
+  aadhaarMobile String?
+  aadhaar       Doc?
+  panCard       Doc?
+
+  address  Address[]
   contacts ContactNumber[]
-  
+
+  //** created by user */
+  CreatedBussiness      Bussiness[]     @relation("bussiness")
+  CraetedBussinessUnits BussinessUnit[] @relation("bussinessUnits")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-} 
 
+  //** Compond Unique Constraints **//
+  @@unique([email, mobile, aadhaar.number])
+  @@unique([email, mobile])
+}
 
-model Profile{
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+model Profile {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
   profileType BussinessType
-  role Role
-  status UserStatus // owner verification pending, invited, active, otp verification pending, blocked
+  status      UserStatus // owner verification pending, invited, active, otp verification pending, blocked
+  
+  //* A profile can have a role */
+  //** In feature a profile can have multiple roles */
+  role        Role
+  
 
   // user profile relatioship 1-M
   userId String @db.ObjectId
-  user  User @relation(fields: [userId], references: [id])
+  User   User   @relation(fields: [userId], references: [id])
 
-  // profile bussiness relatioship M-M
-  bussinessIDs String[] @db.ObjectId  
-  bussiness Bussiness[] @relation(fields: [bussinessIDs], references: [id])
+  //** invitations mangement */
+  invitatedById      String?          @db.ObjectId
+  invitatedBy        Profile?         @relation("invitations", fields: [invitatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invitationStatus   InvitationStatus
+  invitationHashCode String?
+  invitationDate     DateTime?
+  invitationExpiry   DateTime?
 
-  // profile bussinessUnit relatioship M-M
-  bussinessUnitIDs String[] @db.ObjectId  
-  bussinessUnits BussinessUnit[] @relation(fields: [bussinessUnitIDs], references: [id])
+  CreatedInvitations Profile[] @relation("invitations")
 
-  // user Invited by 
-  invitatedById String? @db.ObjectId
-  invitatedBy Profile? @relation("invitations",fields: [invitatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  
-  createdInvitations Profile[] @relation("invitations")
-  createdBussiness Bussiness[] @relation("bussiness")
-  craetedBussinessUnits BussinessUnit[] @relation("bussinessUnits")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // profile bussiness relatioship M-1
+  bussinessId String    @db.ObjectId @unique
+  bussiness   Bussiness @relation(fields: [bussinessId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  // profile bussinessUnit relatioship M-1
+  bussinessUnitId String        @db.ObjectId @unique
+  BussinessUnits   BussinessUnit @relation(fields: [bussinessUnitId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Bussiness {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  GSTIN String
-  LeagalName String @unique
-  displayName String @unique
-  description String?
-  image String?
+  GSTIN               String
+  LeagalName          String          @unique
+  displayName         String          @unique
+  description         String?
+  image               String?
   dateOfIncorporation DateTime?
-  constitution String?
-  address Address?
-  contactInfo contactInfo?
-  status BussinessStatus
+  constitution        String?
+  address             Address?
+  contactInfo         contactInfo?
+  status              BussinessStatus
 
-  profileIds String[] @db.ObjectId
-  userProfiles Profile[] @relation(fields: [profileIds], references: [id])
+  Profiles     Profile[]
+  PaymentSubscription PaymentSubscription[]
+  BussinessUnits      BussinessUnit[]
+
+  createdById String   @db.ObjectId
+  createdBy   User     @relation("bussiness", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   
-  paymentSubscription PaymentSubscription[] 
-  BussinessUnits BussinessUnit[]
-
-  createdById String @db.ObjectId
-  createdBy Profile @relation( "bussiness", fields: [createdById], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
-// branch/warehouse/sub entity
+
+// branch/warehouse/sub entity  -- only valid for QC
 model BussinessUnit {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name String
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
   description String?
-  image String?
+  image       String?
 
   bussinessUnitType BussinessUnitType
 
-  address Address?
+  address     Address?
   contactInfo contactInfo?
-  status BussinessStatus
+  status      BussinessStatus
 
-  profileIds String[] @db.ObjectId
-  userProfiles Profile[] @relation(fields: [profileIds], references: [id])
+  bussinessId String    @db.ObjectId
+  Bussiness   Bussiness @relation(fields: [bussinessId], references: [id])
+  Profiles    Profile[]
 
-  bussinessId String @db.ObjectId
-  bussiness Bussiness @relation(fields: [bussinessId], references: [id])
-
-  createdById String @db.ObjectId
-  createdBy Profile @relation( "bussinessUnits", fields: [createdById], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdById String   @db.ObjectId
+  CreatedBy   User?    @relation("bussinessUnits", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
 }
 
-model PaymentSubscription{
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  bussinessId String @db.ObjectId
-  bussiness Bussiness @relation(fields: [bussinessId], references: [id])
-  subscriptionId String @db.ObjectId
-  lastSubscriptionType SubscriptionType? @relation(fields: [subscriptionId], references: [id])
-  status SubscriptionStatus
-  expiryDate DateTime?
+model PaymentSubscription {
+  id                   String             @id @default(auto()) @map("_id") @db.ObjectId
+  bussinessId          String             @db.ObjectId
+  bussiness            Bussiness          @relation(fields: [bussinessId], references: [id])
+  subscriptionId       String             @db.ObjectId
+  lastSubscriptionType SubscriptionType?  @relation(fields: [subscriptionId], references: [id])
+  status               SubscriptionStatus
+  expiryDate           DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model SubscriptionType {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  description String?
-  price String?
-  count Int?
+  id                   String                @id @default(auto()) @map("_id") @db.ObjectId
+  name                 String
+  description          String?
+  price                String?
+  count                Int?
   PaymentSubscriptions PaymentSubscription[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 }
 
-type  ContactNumber{
-  type String
-  number String
+type ContactNumber {
+  type       String
+  number     String
   isVerified Boolean @default(false)
 }
 
 type Address {
-  type String
+  type         String
   addressLine1 String
   addressLine2 String?
-  city String
-  state String
-  country String
-  pincode String
-  isPrimary Boolean @default(false)
+  city         String
+  state        String
+  country      String
+  pincode      String
+  isPrimary    Boolean @default(false)
 }
 
 type Doc {
-  image String?
-  number String
+  image      String?
+  number     String
   isVerified Boolean @default(false)
 }
 
 type contactInfo {
-  contact ContactNumber[]
+  contact     ContactNumber[]
   socialMedia SocialMedia?
-  email String?
-  website String?
-  latitude String?
-  longitude String?
+  email       String?
+  website     String?
+  latitude    String?
+  longitude   String?
 }
 
 type SocialMedia {
-  facebook String?
-  twitter String?
-  instagram String?
-  linkedin String?
+  facebook   String?
+  twitter    String?
+  instagram  String?
+  linkedin   String?
   googlePlus String?
-  youtube String?
+  youtube    String?
+}
+
+enum InvitationStatus {
+  Pending
+  Accepted
+  Rejected
+  Expired
 }
 
 enum BussinessType {
@@ -205,22 +229,22 @@ enum UserStatus {
 }
 
 enum BussinessStatus {
-  Active 
-  Deleted 
-  Approved 
-  Rejected 
-  Blocked   
-  Draft 
-  Pending  
-  Closed 
+  Active
+  Deleted
+  Approved
+  Rejected
+  Blocked
+  Draft
+  Pending
+  Closed
   Inactive
 }
 
 enum SubscriptionStatus {
-  Active 
-  Deleted 
-  Pending  
-  Closed 
+  Active
+  Deleted
+  Pending
+  Closed
   Inactive
 }
 
@@ -233,5 +257,5 @@ enum Role {
   QCUser
   QCManager
   QCAnalysit
-  QCApprover 
+  QCApprover
 }
