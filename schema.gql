@@ -158,36 +158,35 @@ input BoolWithAggregatesFilter {
 }
 
 type Bussiness {
-  BussinessUnits(cursor: BussinessUnitWhereUniqueInput, distinct: [BussinessUnitScalarFieldEnum!], orderBy: [BussinessUnitOrderByWithRelationInput!], skip: Int, take: Int, where: BussinessUnitWhereInput): [BussinessUnit!]!
   GSTIN: String!
-  LeagalName: String!
   _count: BussinessCount
   address: Address
+  bussinessUnits(cursor: BussinessUnitWhereUniqueInput, distinct: [BussinessUnitScalarFieldEnum!], orderBy: [BussinessUnitOrderByWithRelationInput!], skip: Int, take: Int, where: BussinessUnitWhereInput): [BussinessUnit!]!
   constitution: String
   contactInfo: ContactInfo
   createdAt: DateTime!
-  createdBy: Profile!
+  createdBy: User!
   createdById: String!
   dateOfIncorporation: DateTime
   description: String
   displayName: String!
   id: String!
   image: String
+  leagalName: String!
   paymentSubscription(cursor: PaymentSubscriptionWhereUniqueInput, distinct: [PaymentSubscriptionScalarFieldEnum!], orderBy: [PaymentSubscriptionOrderByWithRelationInput!], skip: Int, take: Int, where: PaymentSubscriptionWhereInput): [PaymentSubscription!]!
+  profiles(cursor: ProfileWhereUniqueInput, distinct: [ProfileScalarFieldEnum!], orderBy: [ProfileOrderByWithRelationInput!], skip: Int, take: Int, where: ProfileWhereInput): [Profile!]!
   status: BussinessStatus!
   updatedAt: DateTime!
-  userProfiles(cursor: ProfileWhereUniqueInput, distinct: [ProfileScalarFieldEnum!], orderBy: [ProfileOrderByWithRelationInput!], skip: Int, take: Int, where: ProfileWhereInput): [Profile!]!
 }
 
 type BussinessCount {
-  BussinessUnits: Int!
+  bussinessUnits: Int!
   paymentSubscription: Int!
-  userProfiles: Int!
+  profiles: Int!
 }
 
 type BussinessCountAggregate {
   GSTIN: Int!
-  LeagalName: Int!
   _all: Int!
   constitution: Int!
   createdAt: Int!
@@ -197,13 +196,13 @@ type BussinessCountAggregate {
   displayName: Int!
   id: Int!
   image: Int!
+  leagalName: Int!
   status: Int!
   updatedAt: Int!
 }
 
 input BussinessCountOrderByAggregateInput {
   GSTIN: SortOrder
-  LeagalName: SortOrder
   constitution: SortOrder
   createdAt: SortOrder
   createdById: SortOrder
@@ -212,33 +211,33 @@ input BussinessCountOrderByAggregateInput {
   displayName: SortOrder
   id: SortOrder
   image: SortOrder
+  leagalName: SortOrder
   status: SortOrder
   updatedAt: SortOrder
 }
 
 input BussinessCreateInput {
-  BussinessUnits: BussinessUnitCreateNestedManyWithoutBussinessInput
   GSTIN: String!
-  LeagalName: String!
   address: AddressNullableCreateEnvelopeInput
+  bussinessUnits: BussinessUnitCreateNestedManyWithoutBussinessInput
   constitution: String
   contactInfo: contactInfoNullableCreateEnvelopeInput
   createdAt: DateTime
-  createdBy: ProfileCreateNestedOneWithoutCreatedBussinessInput!
+  createdBy: UserCreateNestedOneWithoutCreatedBussinessInput!
   dateOfIncorporation: DateTime
   description: String
   displayName: String!
   id: String
   image: String
+  leagalName: String!
   paymentSubscription: PaymentSubscriptionCreateNestedManyWithoutBussinessInput
+  profiles: ProfileCreateNestedManyWithoutBussinessInput
   status: BussinessStatus!
   updatedAt: DateTime
-  userProfiles: ProfileCreateNestedManyWithoutBussinessInput
 }
 
 input BussinessCreateManyCreatedByInput {
   GSTIN: String!
-  LeagalName: String!
   address: AddressNullableCreateEnvelopeInput
   constitution: String
   contactInfo: contactInfoNullableCreateEnvelopeInput
@@ -248,6 +247,7 @@ input BussinessCreateManyCreatedByInput {
   displayName: String!
   id: String
   image: String
+  leagalName: String!
   status: BussinessStatus!
   updatedAt: DateTime
 }
@@ -258,7 +258,6 @@ input BussinessCreateManyCreatedByInputEnvelope {
 
 input BussinessCreateManyInput {
   GSTIN: String!
-  LeagalName: String!
   address: AddressNullableCreateEnvelopeInput
   constitution: String
   contactInfo: contactInfoNullableCreateEnvelopeInput
@@ -269,6 +268,7 @@ input BussinessCreateManyInput {
   displayName: String!
   id: String
   image: String
+  leagalName: String!
   status: BussinessStatus!
   updatedAt: DateTime
 }
@@ -292,10 +292,10 @@ input BussinessCreateNestedOneWithoutPaymentSubscriptionInput {
   create: BussinessCreateWithoutPaymentSubscriptionInput
 }
 
-input BussinessCreateNestedOneWithoutUserProfilesInput {
+input BussinessCreateNestedOneWithoutProfilesInput {
   connect: BussinessWhereUniqueInput
-  connectOrCreate: BussinessCreateOrConnectWithoutUserProfilesInput
-  create: BussinessCreateWithoutUserProfilesInput
+  connectOrCreate: BussinessCreateOrConnectWithoutProfilesInput
+  create: BussinessCreateWithoutProfilesInput
 }
 
 input BussinessCreateOrConnectWithoutBussinessUnitsInput {
@@ -313,35 +313,34 @@ input BussinessCreateOrConnectWithoutPaymentSubscriptionInput {
   where: BussinessWhereUniqueInput!
 }
 
-input BussinessCreateOrConnectWithoutUserProfilesInput {
-  create: BussinessCreateWithoutUserProfilesInput!
+input BussinessCreateOrConnectWithoutProfilesInput {
+  create: BussinessCreateWithoutProfilesInput!
   where: BussinessWhereUniqueInput!
 }
 
 input BussinessCreateWithoutBussinessUnitsInput {
   GSTIN: String!
-  LeagalName: String!
   address: AddressNullableCreateEnvelopeInput
   constitution: String
   contactInfo: contactInfoNullableCreateEnvelopeInput
   createdAt: DateTime
-  createdBy: ProfileCreateNestedOneWithoutCreatedBussinessInput!
+  createdBy: UserCreateNestedOneWithoutCreatedBussinessInput!
   dateOfIncorporation: DateTime
   description: String
   displayName: String!
   id: String
   image: String
+  leagalName: String!
   paymentSubscription: PaymentSubscriptionCreateNestedManyWithoutBussinessInput
+  profiles: ProfileCreateNestedManyWithoutBussinessInput
   status: BussinessStatus!
   updatedAt: DateTime
-  userProfiles: ProfileCreateNestedManyWithoutBussinessInput
 }
 
 input BussinessCreateWithoutCreatedByInput {
-  BussinessUnits: BussinessUnitCreateNestedManyWithoutBussinessInput
   GSTIN: String!
-  LeagalName: String!
   address: AddressNullableCreateEnvelopeInput
+  bussinessUnits: BussinessUnitCreateNestedManyWithoutBussinessInput
   constitution: String
   contactInfo: contactInfoNullableCreateEnvelopeInput
   createdAt: DateTime
@@ -350,45 +349,46 @@ input BussinessCreateWithoutCreatedByInput {
   displayName: String!
   id: String
   image: String
+  leagalName: String!
   paymentSubscription: PaymentSubscriptionCreateNestedManyWithoutBussinessInput
+  profiles: ProfileCreateNestedManyWithoutBussinessInput
   status: BussinessStatus!
   updatedAt: DateTime
-  userProfiles: ProfileCreateNestedManyWithoutBussinessInput
 }
 
 input BussinessCreateWithoutPaymentSubscriptionInput {
-  BussinessUnits: BussinessUnitCreateNestedManyWithoutBussinessInput
   GSTIN: String!
-  LeagalName: String!
   address: AddressNullableCreateEnvelopeInput
+  bussinessUnits: BussinessUnitCreateNestedManyWithoutBussinessInput
   constitution: String
   contactInfo: contactInfoNullableCreateEnvelopeInput
   createdAt: DateTime
-  createdBy: ProfileCreateNestedOneWithoutCreatedBussinessInput!
+  createdBy: UserCreateNestedOneWithoutCreatedBussinessInput!
   dateOfIncorporation: DateTime
   description: String
   displayName: String!
   id: String
   image: String
+  leagalName: String!
+  profiles: ProfileCreateNestedManyWithoutBussinessInput
   status: BussinessStatus!
   updatedAt: DateTime
-  userProfiles: ProfileCreateNestedManyWithoutBussinessInput
 }
 
-input BussinessCreateWithoutUserProfilesInput {
-  BussinessUnits: BussinessUnitCreateNestedManyWithoutBussinessInput
+input BussinessCreateWithoutProfilesInput {
   GSTIN: String!
-  LeagalName: String!
   address: AddressNullableCreateEnvelopeInput
+  bussinessUnits: BussinessUnitCreateNestedManyWithoutBussinessInput
   constitution: String
   contactInfo: contactInfoNullableCreateEnvelopeInput
   createdAt: DateTime
-  createdBy: ProfileCreateNestedOneWithoutCreatedBussinessInput!
+  createdBy: UserCreateNestedOneWithoutCreatedBussinessInput!
   dateOfIncorporation: DateTime
   description: String
   displayName: String!
   id: String
   image: String
+  leagalName: String!
   paymentSubscription: PaymentSubscriptionCreateNestedManyWithoutBussinessInput
   status: BussinessStatus!
   updatedAt: DateTime
@@ -396,7 +396,6 @@ input BussinessCreateWithoutUserProfilesInput {
 
 type BussinessGroupBy {
   GSTIN: String!
-  LeagalName: String!
   _count: BussinessCountAggregate
   _max: BussinessMaxAggregate
   _min: BussinessMinAggregate
@@ -408,6 +407,7 @@ type BussinessGroupBy {
   displayName: String!
   id: String!
   image: String
+  leagalName: String!
   status: BussinessStatus!
   updatedAt: DateTime!
 }
@@ -420,7 +420,6 @@ input BussinessListRelationFilter {
 
 type BussinessMaxAggregate {
   GSTIN: String
-  LeagalName: String
   constitution: String
   createdAt: DateTime
   createdById: String
@@ -429,13 +428,13 @@ type BussinessMaxAggregate {
   displayName: String
   id: String
   image: String
+  leagalName: String
   status: BussinessStatus
   updatedAt: DateTime
 }
 
 input BussinessMaxOrderByAggregateInput {
   GSTIN: SortOrder
-  LeagalName: SortOrder
   constitution: SortOrder
   createdAt: SortOrder
   createdById: SortOrder
@@ -444,13 +443,13 @@ input BussinessMaxOrderByAggregateInput {
   displayName: SortOrder
   id: SortOrder
   image: SortOrder
+  leagalName: SortOrder
   status: SortOrder
   updatedAt: SortOrder
 }
 
 type BussinessMinAggregate {
   GSTIN: String
-  LeagalName: String
   constitution: String
   createdAt: DateTime
   createdById: String
@@ -459,13 +458,13 @@ type BussinessMinAggregate {
   displayName: String
   id: String
   image: String
+  leagalName: String
   status: BussinessStatus
   updatedAt: DateTime
 }
 
 input BussinessMinOrderByAggregateInput {
   GSTIN: SortOrder
-  LeagalName: SortOrder
   constitution: SortOrder
   createdAt: SortOrder
   createdById: SortOrder
@@ -474,6 +473,7 @@ input BussinessMinOrderByAggregateInput {
   displayName: SortOrder
   id: SortOrder
   image: SortOrder
+  leagalName: SortOrder
   status: SortOrder
   updatedAt: SortOrder
 }
@@ -484,7 +484,6 @@ input BussinessOrderByRelationAggregateInput {
 
 input BussinessOrderByWithAggregationInput {
   GSTIN: SortOrder
-  LeagalName: SortOrder
   _count: BussinessCountOrderByAggregateInput
   _max: BussinessMaxOrderByAggregateInput
   _min: BussinessMinOrderByAggregateInput
@@ -496,29 +495,30 @@ input BussinessOrderByWithAggregationInput {
   displayName: SortOrder
   id: SortOrder
   image: SortOrder
+  leagalName: SortOrder
   status: SortOrder
   updatedAt: SortOrder
 }
 
 input BussinessOrderByWithRelationInput {
-  BussinessUnits: BussinessUnitOrderByRelationAggregateInput
   GSTIN: SortOrder
-  LeagalName: SortOrder
   address: AddressOrderByInput
+  bussinessUnits: BussinessUnitOrderByRelationAggregateInput
   constitution: SortOrder
   contactInfo: ContactInfoOrderByInput
   createdAt: SortOrder
-  createdBy: ProfileOrderByWithRelationInput
+  createdBy: UserOrderByWithRelationInput
   createdById: SortOrder
   dateOfIncorporation: SortOrder
   description: SortOrder
   displayName: SortOrder
   id: SortOrder
   image: SortOrder
+  leagalName: SortOrder
   paymentSubscription: PaymentSubscriptionOrderByRelationAggregateInput
+  profiles: ProfileOrderByRelationAggregateInput
   status: SortOrder
   updatedAt: SortOrder
-  userProfiles: ProfileOrderByRelationAggregateInput
 }
 
 input BussinessRelationFilter {
@@ -528,7 +528,6 @@ input BussinessRelationFilter {
 
 enum BussinessScalarFieldEnum {
   GSTIN
-  LeagalName
   constitution
   createdAt
   createdById
@@ -537,6 +536,7 @@ enum BussinessScalarFieldEnum {
   displayName
   id
   image
+  leagalName
   status
   updatedAt
 }
@@ -544,7 +544,6 @@ enum BussinessScalarFieldEnum {
 input BussinessScalarWhereInput {
   AND: [BussinessScalarWhereInput!]
   GSTIN: StringFilter
-  LeagalName: StringFilter
   NOT: [BussinessScalarWhereInput!]
   OR: [BussinessScalarWhereInput!]
   constitution: StringNullableFilter
@@ -555,6 +554,7 @@ input BussinessScalarWhereInput {
   displayName: StringFilter
   id: StringFilter
   image: StringNullableFilter
+  leagalName: StringFilter
   status: EnumBussinessStatusFilter
   updatedAt: DateTimeFilter
 }
@@ -562,7 +562,6 @@ input BussinessScalarWhereInput {
 input BussinessScalarWhereWithAggregatesInput {
   AND: [BussinessScalarWhereWithAggregatesInput!]
   GSTIN: StringWithAggregatesFilter
-  LeagalName: StringWithAggregatesFilter
   NOT: [BussinessScalarWhereWithAggregatesInput!]
   OR: [BussinessScalarWhereWithAggregatesInput!]
   constitution: StringNullableWithAggregatesFilter
@@ -573,6 +572,7 @@ input BussinessScalarWhereWithAggregatesInput {
   displayName: StringWithAggregatesFilter
   id: StringWithAggregatesFilter
   image: StringNullableWithAggregatesFilter
+  leagalName: StringWithAggregatesFilter
   status: EnumBussinessStatusWithAggregatesFilter
   updatedAt: DateTimeWithAggregatesFilter
 }
@@ -592,6 +592,7 @@ enum BussinessStatus {
 enum BussinessType {
   Listing
   QC
+  Trading
 }
 
 type BussinessUnit {
@@ -600,22 +601,21 @@ type BussinessUnit {
   bussiness: Bussiness!
   bussinessId: String!
   bussinessUnitType: BussinessUnitType!
+  cCreatedBy: User
   contactInfo: ContactInfo
   createdAt: DateTime!
-  createdBy: Profile!
   createdById: String!
   description: String
   id: String!
   image: String
   name: String!
-  profileIds: [String!]!
+  profiles(cursor: ProfileWhereUniqueInput, distinct: [ProfileScalarFieldEnum!], orderBy: [ProfileOrderByWithRelationInput!], skip: Int, take: Int, where: ProfileWhereInput): [Profile!]!
   status: BussinessStatus!
   updatedAt: DateTime!
-  userProfiles(cursor: ProfileWhereUniqueInput, distinct: [ProfileScalarFieldEnum!], orderBy: [ProfileOrderByWithRelationInput!], skip: Int, take: Int, where: ProfileWhereInput): [Profile!]!
 }
 
 type BussinessUnitCount {
-  userProfiles: Int!
+  profiles: Int!
 }
 
 type BussinessUnitCountAggregate {
@@ -628,7 +628,6 @@ type BussinessUnitCountAggregate {
   id: Int!
   image: Int!
   name: Int!
-  profileIds: Int!
   status: Int!
   updatedAt: Int!
 }
@@ -642,7 +641,6 @@ input BussinessUnitCountOrderByAggregateInput {
   id: SortOrder
   image: SortOrder
   name: SortOrder
-  profileIds: SortOrder
   status: SortOrder
   updatedAt: SortOrder
 }
@@ -651,17 +649,16 @@ input BussinessUnitCreateInput {
   address: AddressNullableCreateEnvelopeInput
   bussiness: BussinessCreateNestedOneWithoutBussinessUnitsInput!
   bussinessUnitType: BussinessUnitType!
+  cCreatedBy: UserCreateNestedOneWithoutCraetedBussinessUnitsInput
   contactInfo: contactInfoNullableCreateEnvelopeInput
   createdAt: DateTime
-  createdBy: ProfileCreateNestedOneWithoutCraetedBussinessUnitsInput!
   description: String
   id: String
   image: String
   name: String!
-  profileIds: BussinessUnitCreateprofileIdsInput
+  profiles: ProfileCreateNestedManyWithoutBussinessUnitsInput
   status: BussinessStatus!
   updatedAt: DateTime
-  userProfiles: ProfileCreateNestedManyWithoutBussinessUnitsInput
 }
 
 input BussinessUnitCreateManyBussinessInput {
@@ -674,7 +671,6 @@ input BussinessUnitCreateManyBussinessInput {
   id: String
   image: String
   name: String!
-  profileIds: BussinessUnitCreateprofileIdsInput
   status: BussinessStatus!
   updatedAt: DateTime
 }
@@ -683,7 +679,7 @@ input BussinessUnitCreateManyBussinessInputEnvelope {
   data: [BussinessUnitCreateManyBussinessInput!]!
 }
 
-input BussinessUnitCreateManyCreatedByInput {
+input BussinessUnitCreateManyCCreatedByInput {
   address: AddressNullableCreateEnvelopeInput
   bussinessId: String!
   bussinessUnitType: BussinessUnitType!
@@ -693,13 +689,12 @@ input BussinessUnitCreateManyCreatedByInput {
   id: String
   image: String
   name: String!
-  profileIds: BussinessUnitCreateprofileIdsInput
   status: BussinessStatus!
   updatedAt: DateTime
 }
 
-input BussinessUnitCreateManyCreatedByInputEnvelope {
-  data: [BussinessUnitCreateManyCreatedByInput!]!
+input BussinessUnitCreateManyCCreatedByInputEnvelope {
+  data: [BussinessUnitCreateManyCCreatedByInput!]!
 }
 
 input BussinessUnitCreateManyInput {
@@ -713,7 +708,6 @@ input BussinessUnitCreateManyInput {
   id: String
   image: String
   name: String!
-  profileIds: BussinessUnitCreateprofileIdsInput
   status: BussinessStatus!
   updatedAt: DateTime
 }
@@ -725,17 +719,17 @@ input BussinessUnitCreateNestedManyWithoutBussinessInput {
   createMany: BussinessUnitCreateManyBussinessInputEnvelope
 }
 
-input BussinessUnitCreateNestedManyWithoutCreatedByInput {
+input BussinessUnitCreateNestedManyWithoutCCreatedByInput {
   connect: [BussinessUnitWhereUniqueInput!]
-  connectOrCreate: [BussinessUnitCreateOrConnectWithoutCreatedByInput!]
-  create: [BussinessUnitCreateWithoutCreatedByInput!]
-  createMany: BussinessUnitCreateManyCreatedByInputEnvelope
+  connectOrCreate: [BussinessUnitCreateOrConnectWithoutCCreatedByInput!]
+  create: [BussinessUnitCreateWithoutCCreatedByInput!]
+  createMany: BussinessUnitCreateManyCCreatedByInputEnvelope
 }
 
-input BussinessUnitCreateNestedManyWithoutUserProfilesInput {
-  connect: [BussinessUnitWhereUniqueInput!]
-  connectOrCreate: [BussinessUnitCreateOrConnectWithoutUserProfilesInput!]
-  create: [BussinessUnitCreateWithoutUserProfilesInput!]
+input BussinessUnitCreateNestedOneWithoutProfilesInput {
+  connect: BussinessUnitWhereUniqueInput
+  connectOrCreate: BussinessUnitCreateOrConnectWithoutProfilesInput
+  create: BussinessUnitCreateWithoutProfilesInput
 }
 
 input BussinessUnitCreateOrConnectWithoutBussinessInput {
@@ -743,33 +737,32 @@ input BussinessUnitCreateOrConnectWithoutBussinessInput {
   where: BussinessUnitWhereUniqueInput!
 }
 
-input BussinessUnitCreateOrConnectWithoutCreatedByInput {
-  create: BussinessUnitCreateWithoutCreatedByInput!
+input BussinessUnitCreateOrConnectWithoutCCreatedByInput {
+  create: BussinessUnitCreateWithoutCCreatedByInput!
   where: BussinessUnitWhereUniqueInput!
 }
 
-input BussinessUnitCreateOrConnectWithoutUserProfilesInput {
-  create: BussinessUnitCreateWithoutUserProfilesInput!
+input BussinessUnitCreateOrConnectWithoutProfilesInput {
+  create: BussinessUnitCreateWithoutProfilesInput!
   where: BussinessUnitWhereUniqueInput!
 }
 
 input BussinessUnitCreateWithoutBussinessInput {
   address: AddressNullableCreateEnvelopeInput
   bussinessUnitType: BussinessUnitType!
+  cCreatedBy: UserCreateNestedOneWithoutCraetedBussinessUnitsInput
   contactInfo: contactInfoNullableCreateEnvelopeInput
   createdAt: DateTime
-  createdBy: ProfileCreateNestedOneWithoutCraetedBussinessUnitsInput!
   description: String
   id: String
   image: String
   name: String!
-  profileIds: BussinessUnitCreateprofileIdsInput
+  profiles: ProfileCreateNestedManyWithoutBussinessUnitsInput
   status: BussinessStatus!
   updatedAt: DateTime
-  userProfiles: ProfileCreateNestedManyWithoutBussinessUnitsInput
 }
 
-input BussinessUnitCreateWithoutCreatedByInput {
+input BussinessUnitCreateWithoutCCreatedByInput {
   address: AddressNullableCreateEnvelopeInput
   bussiness: BussinessCreateNestedOneWithoutBussinessUnitsInput!
   bussinessUnitType: BussinessUnitType!
@@ -779,30 +772,24 @@ input BussinessUnitCreateWithoutCreatedByInput {
   id: String
   image: String
   name: String!
-  profileIds: BussinessUnitCreateprofileIdsInput
+  profiles: ProfileCreateNestedManyWithoutBussinessUnitsInput
   status: BussinessStatus!
   updatedAt: DateTime
-  userProfiles: ProfileCreateNestedManyWithoutBussinessUnitsInput
 }
 
-input BussinessUnitCreateWithoutUserProfilesInput {
+input BussinessUnitCreateWithoutProfilesInput {
   address: AddressNullableCreateEnvelopeInput
   bussiness: BussinessCreateNestedOneWithoutBussinessUnitsInput!
   bussinessUnitType: BussinessUnitType!
+  cCreatedBy: UserCreateNestedOneWithoutCraetedBussinessUnitsInput
   contactInfo: contactInfoNullableCreateEnvelopeInput
   createdAt: DateTime
-  createdBy: ProfileCreateNestedOneWithoutCraetedBussinessUnitsInput!
   description: String
   id: String
   image: String
   name: String!
-  profileIds: BussinessUnitCreateprofileIdsInput
   status: BussinessStatus!
   updatedAt: DateTime
-}
-
-input BussinessUnitCreateprofileIdsInput {
-  set: [String!]!
 }
 
 type BussinessUnitGroupBy {
@@ -817,7 +804,6 @@ type BussinessUnitGroupBy {
   id: String!
   image: String
   name: String!
-  profileIds: [String!]
   status: BussinessStatus!
   updatedAt: DateTime!
 }
@@ -896,7 +882,6 @@ input BussinessUnitOrderByWithAggregationInput {
   id: SortOrder
   image: SortOrder
   name: SortOrder
-  profileIds: SortOrder
   status: SortOrder
   updatedAt: SortOrder
 }
@@ -906,18 +891,22 @@ input BussinessUnitOrderByWithRelationInput {
   bussiness: BussinessOrderByWithRelationInput
   bussinessId: SortOrder
   bussinessUnitType: SortOrder
+  cCreatedBy: UserOrderByWithRelationInput
   contactInfo: ContactInfoOrderByInput
   createdAt: SortOrder
-  createdBy: ProfileOrderByWithRelationInput
   createdById: SortOrder
   description: SortOrder
   id: SortOrder
   image: SortOrder
   name: SortOrder
-  profileIds: SortOrder
+  profiles: ProfileOrderByRelationAggregateInput
   status: SortOrder
   updatedAt: SortOrder
-  userProfiles: ProfileOrderByRelationAggregateInput
+}
+
+input BussinessUnitRelationFilter {
+  is: BussinessUnitWhereInput
+  isNot: BussinessUnitWhereInput
 }
 
 enum BussinessUnitScalarFieldEnum {
@@ -929,7 +918,6 @@ enum BussinessUnitScalarFieldEnum {
   id
   image
   name
-  profileIds
   status
   updatedAt
 }
@@ -946,7 +934,6 @@ input BussinessUnitScalarWhereInput {
   id: StringFilter
   image: StringNullableFilter
   name: StringFilter
-  profileIds: StringNullableListFilter
   status: EnumBussinessStatusFilter
   updatedAt: DateTimeFilter
 }
@@ -963,7 +950,6 @@ input BussinessUnitScalarWhereWithAggregatesInput {
   id: StringWithAggregatesFilter
   image: StringNullableWithAggregatesFilter
   name: StringWithAggregatesFilter
-  profileIds: StringNullableListFilter
   status: EnumBussinessStatusWithAggregatesFilter
   updatedAt: DateTimeWithAggregatesFilter
 }
@@ -978,16 +964,15 @@ input BussinessUnitUpdateInput {
   address: AddressNullableUpdateEnvelopeInput
   bussiness: BussinessUpdateOneRequiredWithoutBussinessUnitsInput
   bussinessUnitType: EnumBussinessUnitTypeFieldUpdateOperationsInput
+  cCreatedBy: UserUpdateOneWithoutCraetedBussinessUnitsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBy: ProfileUpdateOneRequiredWithoutCraetedBussinessUnitsInput
   description: NullableStringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
   name: StringFieldUpdateOperationsInput
-  profileIds: BussinessUnitUpdateprofileIdsInput
+  profiles: ProfileUpdateManyWithoutBussinessUnitsInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-  userProfiles: ProfileUpdateManyWithoutBussinessUnitsInput
 }
 
 input BussinessUnitUpdateManyMutationInput {
@@ -998,7 +983,6 @@ input BussinessUnitUpdateManyMutationInput {
   description: NullableStringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
   name: StringFieldUpdateOperationsInput
-  profileIds: BussinessUnitUpdateprofileIdsInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
 }
@@ -1008,12 +992,7 @@ input BussinessUnitUpdateManyWithWhereWithoutBussinessInput {
   where: BussinessUnitScalarWhereInput!
 }
 
-input BussinessUnitUpdateManyWithWhereWithoutCreatedByInput {
-  data: BussinessUnitUpdateManyMutationInput!
-  where: BussinessUnitScalarWhereInput!
-}
-
-input BussinessUnitUpdateManyWithWhereWithoutUserProfilesInput {
+input BussinessUnitUpdateManyWithWhereWithoutCCreatedByInput {
   data: BussinessUnitUpdateManyMutationInput!
   where: BussinessUnitScalarWhereInput!
 }
@@ -1032,31 +1011,28 @@ input BussinessUnitUpdateManyWithoutBussinessInput {
   upsert: [BussinessUnitUpsertWithWhereUniqueWithoutBussinessInput!]
 }
 
-input BussinessUnitUpdateManyWithoutCreatedByInput {
+input BussinessUnitUpdateManyWithoutCCreatedByInput {
   connect: [BussinessUnitWhereUniqueInput!]
-  connectOrCreate: [BussinessUnitCreateOrConnectWithoutCreatedByInput!]
-  create: [BussinessUnitCreateWithoutCreatedByInput!]
-  createMany: BussinessUnitCreateManyCreatedByInputEnvelope
+  connectOrCreate: [BussinessUnitCreateOrConnectWithoutCCreatedByInput!]
+  create: [BussinessUnitCreateWithoutCCreatedByInput!]
+  createMany: BussinessUnitCreateManyCCreatedByInputEnvelope
   delete: [BussinessUnitWhereUniqueInput!]
   deleteMany: [BussinessUnitScalarWhereInput!]
   disconnect: [BussinessUnitWhereUniqueInput!]
   set: [BussinessUnitWhereUniqueInput!]
-  update: [BussinessUnitUpdateWithWhereUniqueWithoutCreatedByInput!]
-  updateMany: [BussinessUnitUpdateManyWithWhereWithoutCreatedByInput!]
-  upsert: [BussinessUnitUpsertWithWhereUniqueWithoutCreatedByInput!]
+  update: [BussinessUnitUpdateWithWhereUniqueWithoutCCreatedByInput!]
+  updateMany: [BussinessUnitUpdateManyWithWhereWithoutCCreatedByInput!]
+  upsert: [BussinessUnitUpsertWithWhereUniqueWithoutCCreatedByInput!]
 }
 
-input BussinessUnitUpdateManyWithoutUserProfilesInput {
-  connect: [BussinessUnitWhereUniqueInput!]
-  connectOrCreate: [BussinessUnitCreateOrConnectWithoutUserProfilesInput!]
-  create: [BussinessUnitCreateWithoutUserProfilesInput!]
-  delete: [BussinessUnitWhereUniqueInput!]
-  deleteMany: [BussinessUnitScalarWhereInput!]
-  disconnect: [BussinessUnitWhereUniqueInput!]
-  set: [BussinessUnitWhereUniqueInput!]
-  update: [BussinessUnitUpdateWithWhereUniqueWithoutUserProfilesInput!]
-  updateMany: [BussinessUnitUpdateManyWithWhereWithoutUserProfilesInput!]
-  upsert: [BussinessUnitUpsertWithWhereUniqueWithoutUserProfilesInput!]
+input BussinessUnitUpdateOneWithoutProfilesInput {
+  connect: BussinessUnitWhereUniqueInput
+  connectOrCreate: BussinessUnitCreateOrConnectWithoutProfilesInput
+  create: BussinessUnitCreateWithoutProfilesInput
+  delete: Boolean
+  disconnect: Boolean
+  update: BussinessUnitUpdateWithoutProfilesInput
+  upsert: BussinessUnitUpsertWithoutProfilesInput
 }
 
 input BussinessUnitUpdateWithWhereUniqueWithoutBussinessInput {
@@ -1064,32 +1040,26 @@ input BussinessUnitUpdateWithWhereUniqueWithoutBussinessInput {
   where: BussinessUnitWhereUniqueInput!
 }
 
-input BussinessUnitUpdateWithWhereUniqueWithoutCreatedByInput {
-  data: BussinessUnitUpdateWithoutCreatedByInput!
-  where: BussinessUnitWhereUniqueInput!
-}
-
-input BussinessUnitUpdateWithWhereUniqueWithoutUserProfilesInput {
-  data: BussinessUnitUpdateWithoutUserProfilesInput!
+input BussinessUnitUpdateWithWhereUniqueWithoutCCreatedByInput {
+  data: BussinessUnitUpdateWithoutCCreatedByInput!
   where: BussinessUnitWhereUniqueInput!
 }
 
 input BussinessUnitUpdateWithoutBussinessInput {
   address: AddressNullableUpdateEnvelopeInput
   bussinessUnitType: EnumBussinessUnitTypeFieldUpdateOperationsInput
+  cCreatedBy: UserUpdateOneWithoutCraetedBussinessUnitsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBy: ProfileUpdateOneRequiredWithoutCraetedBussinessUnitsInput
   description: NullableStringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
   name: StringFieldUpdateOperationsInput
-  profileIds: BussinessUnitUpdateprofileIdsInput
+  profiles: ProfileUpdateManyWithoutBussinessUnitsInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-  userProfiles: ProfileUpdateManyWithoutBussinessUnitsInput
 }
 
-input BussinessUnitUpdateWithoutCreatedByInput {
+input BussinessUnitUpdateWithoutCCreatedByInput {
   address: AddressNullableUpdateEnvelopeInput
   bussiness: BussinessUpdateOneRequiredWithoutBussinessUnitsInput
   bussinessUnitType: EnumBussinessUnitTypeFieldUpdateOperationsInput
@@ -1098,30 +1068,23 @@ input BussinessUnitUpdateWithoutCreatedByInput {
   description: NullableStringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
   name: StringFieldUpdateOperationsInput
-  profileIds: BussinessUnitUpdateprofileIdsInput
+  profiles: ProfileUpdateManyWithoutBussinessUnitsInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-  userProfiles: ProfileUpdateManyWithoutBussinessUnitsInput
 }
 
-input BussinessUnitUpdateWithoutUserProfilesInput {
+input BussinessUnitUpdateWithoutProfilesInput {
   address: AddressNullableUpdateEnvelopeInput
   bussiness: BussinessUpdateOneRequiredWithoutBussinessUnitsInput
   bussinessUnitType: EnumBussinessUnitTypeFieldUpdateOperationsInput
+  cCreatedBy: UserUpdateOneWithoutCraetedBussinessUnitsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBy: ProfileUpdateOneRequiredWithoutCraetedBussinessUnitsInput
   description: NullableStringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
   name: StringFieldUpdateOperationsInput
-  profileIds: BussinessUnitUpdateprofileIdsInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-}
-
-input BussinessUnitUpdateprofileIdsInput {
-  push: [String!]
-  set: [String!]
 }
 
 input BussinessUnitUpsertWithWhereUniqueWithoutBussinessInput {
@@ -1130,16 +1093,15 @@ input BussinessUnitUpsertWithWhereUniqueWithoutBussinessInput {
   where: BussinessUnitWhereUniqueInput!
 }
 
-input BussinessUnitUpsertWithWhereUniqueWithoutCreatedByInput {
-  create: BussinessUnitCreateWithoutCreatedByInput!
-  update: BussinessUnitUpdateWithoutCreatedByInput!
+input BussinessUnitUpsertWithWhereUniqueWithoutCCreatedByInput {
+  create: BussinessUnitCreateWithoutCCreatedByInput!
+  update: BussinessUnitUpdateWithoutCCreatedByInput!
   where: BussinessUnitWhereUniqueInput!
 }
 
-input BussinessUnitUpsertWithWhereUniqueWithoutUserProfilesInput {
-  create: BussinessUnitCreateWithoutUserProfilesInput!
-  update: BussinessUnitUpdateWithoutUserProfilesInput!
-  where: BussinessUnitWhereUniqueInput!
+input BussinessUnitUpsertWithoutProfilesInput {
+  create: BussinessUnitCreateWithoutProfilesInput!
+  update: BussinessUnitUpdateWithoutProfilesInput!
 }
 
 input BussinessUnitWhereInput {
@@ -1150,18 +1112,17 @@ input BussinessUnitWhereInput {
   bussiness: BussinessRelationFilter
   bussinessId: StringFilter
   bussinessUnitType: EnumBussinessUnitTypeFilter
+  cCreatedBy: UserRelationFilter
   contactInfo: ContactInfoNullableCompositeFilter
   createdAt: DateTimeFilter
-  createdBy: ProfileRelationFilter
   createdById: StringFilter
   description: StringNullableFilter
   id: StringFilter
   image: StringNullableFilter
   name: StringFilter
-  profileIds: StringNullableListFilter
+  profiles: ProfileListRelationFilter
   status: EnumBussinessStatusFilter
   updatedAt: DateTimeFilter
-  userProfiles: ProfileListRelationFilter
 }
 
 input BussinessUnitWhereUniqueInput {
@@ -1169,27 +1130,26 @@ input BussinessUnitWhereUniqueInput {
 }
 
 input BussinessUpdateInput {
-  BussinessUnits: BussinessUnitUpdateManyWithoutBussinessInput
   GSTIN: StringFieldUpdateOperationsInput
-  LeagalName: StringFieldUpdateOperationsInput
   address: AddressNullableUpdateEnvelopeInput
+  bussinessUnits: BussinessUnitUpdateManyWithoutBussinessInput
   constitution: NullableStringFieldUpdateOperationsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBy: ProfileUpdateOneRequiredWithoutCreatedBussinessInput
+  createdBy: UserUpdateOneRequiredWithoutCreatedBussinessInput
   dateOfIncorporation: NullableDateTimeFieldUpdateOperationsInput
   description: NullableStringFieldUpdateOperationsInput
   displayName: StringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
+  leagalName: StringFieldUpdateOperationsInput
   paymentSubscription: PaymentSubscriptionUpdateManyWithoutBussinessInput
+  profiles: ProfileUpdateManyWithoutBussinessInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-  userProfiles: ProfileUpdateManyWithoutBussinessInput
 }
 
 input BussinessUpdateManyMutationInput {
   GSTIN: StringFieldUpdateOperationsInput
-  LeagalName: StringFieldUpdateOperationsInput
   address: AddressNullableUpdateEnvelopeInput
   constitution: NullableStringFieldUpdateOperationsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
@@ -1198,6 +1158,7 @@ input BussinessUpdateManyMutationInput {
   description: NullableStringFieldUpdateOperationsInput
   displayName: StringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
+  leagalName: StringFieldUpdateOperationsInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
 }
@@ -1237,12 +1198,14 @@ input BussinessUpdateOneRequiredWithoutPaymentSubscriptionInput {
   upsert: BussinessUpsertWithoutPaymentSubscriptionInput
 }
 
-input BussinessUpdateOneRequiredWithoutUserProfilesInput {
+input BussinessUpdateOneWithoutProfilesInput {
   connect: BussinessWhereUniqueInput
-  connectOrCreate: BussinessCreateOrConnectWithoutUserProfilesInput
-  create: BussinessCreateWithoutUserProfilesInput
-  update: BussinessUpdateWithoutUserProfilesInput
-  upsert: BussinessUpsertWithoutUserProfilesInput
+  connectOrCreate: BussinessCreateOrConnectWithoutProfilesInput
+  create: BussinessCreateWithoutProfilesInput
+  delete: Boolean
+  disconnect: Boolean
+  update: BussinessUpdateWithoutProfilesInput
+  upsert: BussinessUpsertWithoutProfilesInput
 }
 
 input BussinessUpdateWithWhereUniqueWithoutCreatedByInput {
@@ -1252,27 +1215,26 @@ input BussinessUpdateWithWhereUniqueWithoutCreatedByInput {
 
 input BussinessUpdateWithoutBussinessUnitsInput {
   GSTIN: StringFieldUpdateOperationsInput
-  LeagalName: StringFieldUpdateOperationsInput
   address: AddressNullableUpdateEnvelopeInput
   constitution: NullableStringFieldUpdateOperationsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBy: ProfileUpdateOneRequiredWithoutCreatedBussinessInput
+  createdBy: UserUpdateOneRequiredWithoutCreatedBussinessInput
   dateOfIncorporation: NullableDateTimeFieldUpdateOperationsInput
   description: NullableStringFieldUpdateOperationsInput
   displayName: StringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
+  leagalName: StringFieldUpdateOperationsInput
   paymentSubscription: PaymentSubscriptionUpdateManyWithoutBussinessInput
+  profiles: ProfileUpdateManyWithoutBussinessInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-  userProfiles: ProfileUpdateManyWithoutBussinessInput
 }
 
 input BussinessUpdateWithoutCreatedByInput {
-  BussinessUnits: BussinessUnitUpdateManyWithoutBussinessInput
   GSTIN: StringFieldUpdateOperationsInput
-  LeagalName: StringFieldUpdateOperationsInput
   address: AddressNullableUpdateEnvelopeInput
+  bussinessUnits: BussinessUnitUpdateManyWithoutBussinessInput
   constitution: NullableStringFieldUpdateOperationsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -1280,43 +1242,44 @@ input BussinessUpdateWithoutCreatedByInput {
   description: NullableStringFieldUpdateOperationsInput
   displayName: StringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
+  leagalName: StringFieldUpdateOperationsInput
   paymentSubscription: PaymentSubscriptionUpdateManyWithoutBussinessInput
+  profiles: ProfileUpdateManyWithoutBussinessInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-  userProfiles: ProfileUpdateManyWithoutBussinessInput
 }
 
 input BussinessUpdateWithoutPaymentSubscriptionInput {
-  BussinessUnits: BussinessUnitUpdateManyWithoutBussinessInput
   GSTIN: StringFieldUpdateOperationsInput
-  LeagalName: StringFieldUpdateOperationsInput
   address: AddressNullableUpdateEnvelopeInput
+  bussinessUnits: BussinessUnitUpdateManyWithoutBussinessInput
   constitution: NullableStringFieldUpdateOperationsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBy: ProfileUpdateOneRequiredWithoutCreatedBussinessInput
+  createdBy: UserUpdateOneRequiredWithoutCreatedBussinessInput
   dateOfIncorporation: NullableDateTimeFieldUpdateOperationsInput
   description: NullableStringFieldUpdateOperationsInput
   displayName: StringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
+  leagalName: StringFieldUpdateOperationsInput
+  profiles: ProfileUpdateManyWithoutBussinessInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-  userProfiles: ProfileUpdateManyWithoutBussinessInput
 }
 
-input BussinessUpdateWithoutUserProfilesInput {
-  BussinessUnits: BussinessUnitUpdateManyWithoutBussinessInput
+input BussinessUpdateWithoutProfilesInput {
   GSTIN: StringFieldUpdateOperationsInput
-  LeagalName: StringFieldUpdateOperationsInput
   address: AddressNullableUpdateEnvelopeInput
+  bussinessUnits: BussinessUnitUpdateManyWithoutBussinessInput
   constitution: NullableStringFieldUpdateOperationsInput
   contactInfo: contactInfoNullableUpdateEnvelopeInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBy: ProfileUpdateOneRequiredWithoutCreatedBussinessInput
+  createdBy: UserUpdateOneRequiredWithoutCreatedBussinessInput
   dateOfIncorporation: NullableDateTimeFieldUpdateOperationsInput
   description: NullableStringFieldUpdateOperationsInput
   displayName: StringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
+  leagalName: StringFieldUpdateOperationsInput
   paymentSubscription: PaymentSubscriptionUpdateManyWithoutBussinessInput
   status: EnumBussinessStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
@@ -1338,39 +1301,39 @@ input BussinessUpsertWithoutPaymentSubscriptionInput {
   update: BussinessUpdateWithoutPaymentSubscriptionInput!
 }
 
-input BussinessUpsertWithoutUserProfilesInput {
-  create: BussinessCreateWithoutUserProfilesInput!
-  update: BussinessUpdateWithoutUserProfilesInput!
+input BussinessUpsertWithoutProfilesInput {
+  create: BussinessCreateWithoutProfilesInput!
+  update: BussinessUpdateWithoutProfilesInput!
 }
 
 input BussinessWhereInput {
   AND: [BussinessWhereInput!]
-  BussinessUnits: BussinessUnitListRelationFilter
   GSTIN: StringFilter
-  LeagalName: StringFilter
   NOT: [BussinessWhereInput!]
   OR: [BussinessWhereInput!]
   address: AddressNullableCompositeFilter
+  bussinessUnits: BussinessUnitListRelationFilter
   constitution: StringNullableFilter
   contactInfo: ContactInfoNullableCompositeFilter
   createdAt: DateTimeFilter
-  createdBy: ProfileRelationFilter
+  createdBy: UserRelationFilter
   createdById: StringFilter
   dateOfIncorporation: DateTimeNullableFilter
   description: StringNullableFilter
   displayName: StringFilter
   id: StringFilter
   image: StringNullableFilter
+  leagalName: StringFilter
   paymentSubscription: PaymentSubscriptionListRelationFilter
+  profiles: ProfileListRelationFilter
   status: EnumBussinessStatusFilter
   updatedAt: DateTimeFilter
-  userProfiles: ProfileListRelationFilter
 }
 
 input BussinessWhereUniqueInput {
-  LeagalName: String
   displayName: String
   id: String
+  leagalName: String
 }
 
 type ContactInfo {
@@ -1640,6 +1603,27 @@ input EnumBussinessUnitTypeWithAggregatesFilter {
   notIn: [BussinessUnitType!]
 }
 
+input EnumInvitationStatusFieldUpdateOperationsInput {
+  set: InvitationStatus
+}
+
+input EnumInvitationStatusFilter {
+  equals: InvitationStatus
+  in: [InvitationStatus!]
+  not: NestedEnumInvitationStatusFilter
+  notIn: [InvitationStatus!]
+}
+
+input EnumInvitationStatusWithAggregatesFilter {
+  _count: NestedIntFilter
+  _max: NestedEnumInvitationStatusFilter
+  _min: NestedEnumInvitationStatusFilter
+  equals: InvitationStatus
+  in: [InvitationStatus!]
+  not: NestedEnumInvitationStatusWithAggregatesFilter
+  notIn: [InvitationStatus!]
+}
+
 input EnumRoleFieldUpdateOperationsInput {
   set: Role
 }
@@ -1730,6 +1714,15 @@ input IntNullableWithAggregatesFilter {
   lte: Int
   not: NestedIntNullableWithAggregatesFilter
   notIn: [Int!]
+}
+
+enum InvitationStatus {
+  Accepted
+  Expired
+  NotRequired
+  PendingOwnerApproval
+  PendingUserApproval
+  Rejected
 }
 
 type Mutation {
@@ -1891,6 +1884,23 @@ input NestedEnumBussinessUnitTypeWithAggregatesFilter {
   in: [BussinessUnitType!]
   not: NestedEnumBussinessUnitTypeWithAggregatesFilter
   notIn: [BussinessUnitType!]
+}
+
+input NestedEnumInvitationStatusFilter {
+  equals: InvitationStatus
+  in: [InvitationStatus!]
+  not: NestedEnumInvitationStatusFilter
+  notIn: [InvitationStatus!]
+}
+
+input NestedEnumInvitationStatusWithAggregatesFilter {
+  _count: NestedIntFilter
+  _max: NestedEnumInvitationStatusFilter
+  _min: NestedEnumInvitationStatusFilter
+  equals: InvitationStatus
+  in: [InvitationStatus!]
+  not: NestedEnumInvitationStatusWithAggregatesFilter
+  notIn: [InvitationStatus!]
 }
 
 input NestedEnumRoleFilter {
@@ -2437,17 +2447,19 @@ input PaymentSubscriptionWhereUniqueInput {
 
 type Profile {
   _count: ProfileCount
-  bussiness: Bussiness!
-  bussinessId: String!
-  bussinessUnitIDs: [String!]!
-  bussinessUnits(cursor: BussinessUnitWhereUniqueInput, distinct: [BussinessUnitScalarFieldEnum!], orderBy: [BussinessUnitOrderByWithRelationInput!], skip: Int, take: Int, where: BussinessUnitWhereInput): [BussinessUnit!]!
-  craetedBussinessUnits(cursor: BussinessUnitWhereUniqueInput, distinct: [BussinessUnitScalarFieldEnum!], orderBy: [BussinessUnitOrderByWithRelationInput!], skip: Int, take: Int, where: BussinessUnitWhereInput): [BussinessUnit!]!
+  bussiness: Bussiness
+  bussinessId: String
+  bussinessUnitId: String
+  bussinessUnits: BussinessUnit
   createdAt: DateTime!
-  createdBussiness(cursor: BussinessWhereUniqueInput, distinct: [BussinessScalarFieldEnum!], orderBy: [BussinessOrderByWithRelationInput!], skip: Int, take: Int, where: BussinessWhereInput): [Bussiness!]!
   createdInvitations(cursor: ProfileWhereUniqueInput, distinct: [ProfileScalarFieldEnum!], orderBy: [ProfileOrderByWithRelationInput!], skip: Int, take: Int, where: ProfileWhereInput): [Profile!]!
   id: String!
   invitatedBy: Profile
   invitatedById: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2457,19 +2469,20 @@ type Profile {
 }
 
 type ProfileCount {
-  bussinessUnits: Int!
-  craetedBussinessUnits: Int!
-  createdBussiness: Int!
   createdInvitations: Int!
 }
 
 type ProfileCountAggregate {
   _all: Int!
   bussinessId: Int!
-  bussinessUnitIDs: Int!
+  bussinessUnitId: Int!
   createdAt: Int!
   id: Int!
   invitatedById: Int!
+  invitationDate: Int!
+  invitationExpiry: Int!
+  invitationHashCode: Int!
+  invitationStatus: Int!
   profileType: Int!
   role: Int!
   status: Int!
@@ -2479,10 +2492,14 @@ type ProfileCountAggregate {
 
 input ProfileCountOrderByAggregateInput {
   bussinessId: SortOrder
-  bussinessUnitIDs: SortOrder
+  bussinessUnitId: SortOrder
   createdAt: SortOrder
   id: SortOrder
   invitatedById: SortOrder
+  invitationDate: SortOrder
+  invitationExpiry: SortOrder
+  invitationHashCode: SortOrder
+  invitationStatus: SortOrder
   profileType: SortOrder
   role: SortOrder
   status: SortOrder
@@ -2491,15 +2508,16 @@ input ProfileCountOrderByAggregateInput {
 }
 
 input ProfileCreateInput {
-  bussiness: BussinessCreateNestedOneWithoutUserProfilesInput!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitCreateNestedManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCreatedByInput
+  bussiness: BussinessCreateNestedOneWithoutProfilesInput
+  bussinessUnits: BussinessUnitCreateNestedOneWithoutProfilesInput
   createdAt: DateTime
-  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
   createdInvitations: ProfileCreateNestedManyWithoutInvitatedByInput
   id: String
   invitatedBy: ProfileCreateNestedOneWithoutCreatedInvitationsInput
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2508,10 +2526,14 @@ input ProfileCreateInput {
 }
 
 input ProfileCreateManyBussinessInput {
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
+  bussinessUnitId: String
   createdAt: DateTime
   id: String
   invitatedById: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2523,12 +2545,36 @@ input ProfileCreateManyBussinessInputEnvelope {
   data: [ProfileCreateManyBussinessInput!]!
 }
 
-input ProfileCreateManyInput {
-  bussinessId: String!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
+input ProfileCreateManyBussinessUnitsInput {
+  bussinessId: String
   createdAt: DateTime
   id: String
   invitatedById: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
+  profileType: BussinessType!
+  role: Role!
+  status: UserStatus!
+  updatedAt: DateTime
+  userId: String!
+}
+
+input ProfileCreateManyBussinessUnitsInputEnvelope {
+  data: [ProfileCreateManyBussinessUnitsInput!]!
+}
+
+input ProfileCreateManyInput {
+  bussinessId: String
+  bussinessUnitId: String
+  createdAt: DateTime
+  id: String
+  invitatedById: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2537,10 +2583,14 @@ input ProfileCreateManyInput {
 }
 
 input ProfileCreateManyInvitatedByInput {
-  bussinessId: String!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
+  bussinessId: String
+  bussinessUnitId: String
   createdAt: DateTime
   id: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2553,11 +2603,15 @@ input ProfileCreateManyInvitatedByInputEnvelope {
 }
 
 input ProfileCreateManyUserInput {
-  bussinessId: String!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
+  bussinessId: String
+  bussinessUnitId: String
   createdAt: DateTime
   id: String
   invitatedById: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2579,6 +2633,7 @@ input ProfileCreateNestedManyWithoutBussinessUnitsInput {
   connect: [ProfileWhereUniqueInput!]
   connectOrCreate: [ProfileCreateOrConnectWithoutBussinessUnitsInput!]
   create: [ProfileCreateWithoutBussinessUnitsInput!]
+  createMany: ProfileCreateManyBussinessUnitsInputEnvelope
 }
 
 input ProfileCreateNestedManyWithoutInvitatedByInput {
@@ -2595,18 +2650,6 @@ input ProfileCreateNestedManyWithoutUserInput {
   createMany: ProfileCreateManyUserInputEnvelope
 }
 
-input ProfileCreateNestedOneWithoutCraetedBussinessUnitsInput {
-  connect: ProfileWhereUniqueInput
-  connectOrCreate: ProfileCreateOrConnectWithoutCraetedBussinessUnitsInput
-  create: ProfileCreateWithoutCraetedBussinessUnitsInput
-}
-
-input ProfileCreateNestedOneWithoutCreatedBussinessInput {
-  connect: ProfileWhereUniqueInput
-  connectOrCreate: ProfileCreateOrConnectWithoutCreatedBussinessInput
-  create: ProfileCreateWithoutCreatedBussinessInput
-}
-
 input ProfileCreateNestedOneWithoutCreatedInvitationsInput {
   connect: ProfileWhereUniqueInput
   connectOrCreate: ProfileCreateOrConnectWithoutCreatedInvitationsInput
@@ -2620,16 +2663,6 @@ input ProfileCreateOrConnectWithoutBussinessInput {
 
 input ProfileCreateOrConnectWithoutBussinessUnitsInput {
   create: ProfileCreateWithoutBussinessUnitsInput!
-  where: ProfileWhereUniqueInput!
-}
-
-input ProfileCreateOrConnectWithoutCraetedBussinessUnitsInput {
-  create: ProfileCreateWithoutCraetedBussinessUnitsInput!
-  where: ProfileWhereUniqueInput!
-}
-
-input ProfileCreateOrConnectWithoutCreatedBussinessInput {
-  create: ProfileCreateWithoutCreatedBussinessInput!
   where: ProfileWhereUniqueInput!
 }
 
@@ -2649,14 +2682,15 @@ input ProfileCreateOrConnectWithoutUserInput {
 }
 
 input ProfileCreateWithoutBussinessInput {
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitCreateNestedManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCreatedByInput
+  bussinessUnits: BussinessUnitCreateNestedOneWithoutProfilesInput
   createdAt: DateTime
-  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
   createdInvitations: ProfileCreateNestedManyWithoutInvitatedByInput
   id: String
   invitatedBy: ProfileCreateNestedOneWithoutCreatedInvitationsInput
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2665,46 +2699,15 @@ input ProfileCreateWithoutBussinessInput {
 }
 
 input ProfileCreateWithoutBussinessUnitsInput {
-  bussiness: BussinessCreateNestedOneWithoutUserProfilesInput!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
-  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCreatedByInput
-  createdAt: DateTime
-  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
-  createdInvitations: ProfileCreateNestedManyWithoutInvitatedByInput
-  id: String
-  invitatedBy: ProfileCreateNestedOneWithoutCreatedInvitationsInput
-  profileType: BussinessType!
-  role: Role!
-  status: UserStatus!
-  updatedAt: DateTime
-  user: UserCreateNestedOneWithoutProfilesInput!
-}
-
-input ProfileCreateWithoutCraetedBussinessUnitsInput {
-  bussiness: BussinessCreateNestedOneWithoutUserProfilesInput!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitCreateNestedManyWithoutUserProfilesInput
-  createdAt: DateTime
-  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
-  createdInvitations: ProfileCreateNestedManyWithoutInvitatedByInput
-  id: String
-  invitatedBy: ProfileCreateNestedOneWithoutCreatedInvitationsInput
-  profileType: BussinessType!
-  role: Role!
-  status: UserStatus!
-  updatedAt: DateTime
-  user: UserCreateNestedOneWithoutProfilesInput!
-}
-
-input ProfileCreateWithoutCreatedBussinessInput {
-  bussiness: BussinessCreateNestedOneWithoutUserProfilesInput!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitCreateNestedManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCreatedByInput
+  bussiness: BussinessCreateNestedOneWithoutProfilesInput
   createdAt: DateTime
   createdInvitations: ProfileCreateNestedManyWithoutInvitatedByInput
   id: String
   invitatedBy: ProfileCreateNestedOneWithoutCreatedInvitationsInput
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2713,14 +2716,15 @@ input ProfileCreateWithoutCreatedBussinessInput {
 }
 
 input ProfileCreateWithoutCreatedInvitationsInput {
-  bussiness: BussinessCreateNestedOneWithoutUserProfilesInput!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitCreateNestedManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCreatedByInput
+  bussiness: BussinessCreateNestedOneWithoutProfilesInput
+  bussinessUnits: BussinessUnitCreateNestedOneWithoutProfilesInput
   createdAt: DateTime
-  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
   id: String
   invitatedBy: ProfileCreateNestedOneWithoutCreatedInvitationsInput
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2729,14 +2733,15 @@ input ProfileCreateWithoutCreatedInvitationsInput {
 }
 
 input ProfileCreateWithoutInvitatedByInput {
-  bussiness: BussinessCreateNestedOneWithoutUserProfilesInput!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitCreateNestedManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCreatedByInput
+  bussiness: BussinessCreateNestedOneWithoutProfilesInput
+  bussinessUnits: BussinessUnitCreateNestedOneWithoutProfilesInput
   createdAt: DateTime
-  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
   createdInvitations: ProfileCreateNestedManyWithoutInvitatedByInput
   id: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2745,34 +2750,35 @@ input ProfileCreateWithoutInvitatedByInput {
 }
 
 input ProfileCreateWithoutUserInput {
-  bussiness: BussinessCreateNestedOneWithoutUserProfilesInput!
-  bussinessUnitIDs: ProfileCreatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitCreateNestedManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCreatedByInput
+  bussiness: BussinessCreateNestedOneWithoutProfilesInput
+  bussinessUnits: BussinessUnitCreateNestedOneWithoutProfilesInput
   createdAt: DateTime
-  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
   createdInvitations: ProfileCreateNestedManyWithoutInvitatedByInput
   id: String
   invitatedBy: ProfileCreateNestedOneWithoutCreatedInvitationsInput
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
   updatedAt: DateTime
 }
 
-input ProfileCreatebussinessUnitIDsInput {
-  set: [String!]!
-}
-
 type ProfileGroupBy {
   _count: ProfileCountAggregate
   _max: ProfileMaxAggregate
   _min: ProfileMinAggregate
-  bussinessId: String!
-  bussinessUnitIDs: [String!]
+  bussinessId: String
+  bussinessUnitId: String
   createdAt: DateTime!
   id: String!
   invitatedById: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus!
   profileType: BussinessType!
   role: Role!
   status: UserStatus!
@@ -2788,9 +2794,14 @@ input ProfileListRelationFilter {
 
 type ProfileMaxAggregate {
   bussinessId: String
+  bussinessUnitId: String
   createdAt: DateTime
   id: String
   invitatedById: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus
   profileType: BussinessType
   role: Role
   status: UserStatus
@@ -2800,9 +2811,14 @@ type ProfileMaxAggregate {
 
 input ProfileMaxOrderByAggregateInput {
   bussinessId: SortOrder
+  bussinessUnitId: SortOrder
   createdAt: SortOrder
   id: SortOrder
   invitatedById: SortOrder
+  invitationDate: SortOrder
+  invitationExpiry: SortOrder
+  invitationHashCode: SortOrder
+  invitationStatus: SortOrder
   profileType: SortOrder
   role: SortOrder
   status: SortOrder
@@ -2812,9 +2828,14 @@ input ProfileMaxOrderByAggregateInput {
 
 type ProfileMinAggregate {
   bussinessId: String
+  bussinessUnitId: String
   createdAt: DateTime
   id: String
   invitatedById: String
+  invitationDate: DateTime
+  invitationExpiry: DateTime
+  invitationHashCode: String
+  invitationStatus: InvitationStatus
   profileType: BussinessType
   role: Role
   status: UserStatus
@@ -2824,9 +2845,14 @@ type ProfileMinAggregate {
 
 input ProfileMinOrderByAggregateInput {
   bussinessId: SortOrder
+  bussinessUnitId: SortOrder
   createdAt: SortOrder
   id: SortOrder
   invitatedById: SortOrder
+  invitationDate: SortOrder
+  invitationExpiry: SortOrder
+  invitationHashCode: SortOrder
+  invitationStatus: SortOrder
   profileType: SortOrder
   role: SortOrder
   status: SortOrder
@@ -2843,10 +2869,14 @@ input ProfileOrderByWithAggregationInput {
   _max: ProfileMaxOrderByAggregateInput
   _min: ProfileMinOrderByAggregateInput
   bussinessId: SortOrder
-  bussinessUnitIDs: SortOrder
+  bussinessUnitId: SortOrder
   createdAt: SortOrder
   id: SortOrder
   invitatedById: SortOrder
+  invitationDate: SortOrder
+  invitationExpiry: SortOrder
+  invitationHashCode: SortOrder
+  invitationStatus: SortOrder
   profileType: SortOrder
   role: SortOrder
   status: SortOrder
@@ -2857,15 +2887,17 @@ input ProfileOrderByWithAggregationInput {
 input ProfileOrderByWithRelationInput {
   bussiness: BussinessOrderByWithRelationInput
   bussinessId: SortOrder
-  bussinessUnitIDs: SortOrder
-  bussinessUnits: BussinessUnitOrderByRelationAggregateInput
-  craetedBussinessUnits: BussinessUnitOrderByRelationAggregateInput
+  bussinessUnitId: SortOrder
+  bussinessUnits: BussinessUnitOrderByWithRelationInput
   createdAt: SortOrder
-  createdBussiness: BussinessOrderByRelationAggregateInput
   createdInvitations: ProfileOrderByRelationAggregateInput
   id: SortOrder
   invitatedBy: ProfileOrderByWithRelationInput
   invitatedById: SortOrder
+  invitationDate: SortOrder
+  invitationExpiry: SortOrder
+  invitationHashCode: SortOrder
+  invitationStatus: SortOrder
   profileType: SortOrder
   role: SortOrder
   status: SortOrder
@@ -2881,10 +2913,14 @@ input ProfileRelationFilter {
 
 enum ProfileScalarFieldEnum {
   bussinessId
-  bussinessUnitIDs
+  bussinessUnitId
   createdAt
   id
   invitatedById
+  invitationDate
+  invitationExpiry
+  invitationHashCode
+  invitationStatus
   profileType
   role
   status
@@ -2896,11 +2932,15 @@ input ProfileScalarWhereInput {
   AND: [ProfileScalarWhereInput!]
   NOT: [ProfileScalarWhereInput!]
   OR: [ProfileScalarWhereInput!]
-  bussinessId: StringFilter
-  bussinessUnitIDs: StringNullableListFilter
+  bussinessId: StringNullableFilter
+  bussinessUnitId: StringNullableFilter
   createdAt: DateTimeFilter
   id: StringFilter
   invitatedById: StringNullableFilter
+  invitationDate: DateTimeNullableFilter
+  invitationExpiry: DateTimeNullableFilter
+  invitationHashCode: StringNullableFilter
+  invitationStatus: EnumInvitationStatusFilter
   profileType: EnumBussinessTypeFilter
   role: EnumRoleFilter
   status: EnumUserStatusFilter
@@ -2912,11 +2952,15 @@ input ProfileScalarWhereWithAggregatesInput {
   AND: [ProfileScalarWhereWithAggregatesInput!]
   NOT: [ProfileScalarWhereWithAggregatesInput!]
   OR: [ProfileScalarWhereWithAggregatesInput!]
-  bussinessId: StringWithAggregatesFilter
-  bussinessUnitIDs: StringNullableListFilter
+  bussinessId: StringNullableWithAggregatesFilter
+  bussinessUnitId: StringNullableWithAggregatesFilter
   createdAt: DateTimeWithAggregatesFilter
   id: StringWithAggregatesFilter
   invitatedById: StringNullableWithAggregatesFilter
+  invitationDate: DateTimeNullableWithAggregatesFilter
+  invitationExpiry: DateTimeNullableWithAggregatesFilter
+  invitationHashCode: StringNullableWithAggregatesFilter
+  invitationStatus: EnumInvitationStatusWithAggregatesFilter
   profileType: EnumBussinessTypeWithAggregatesFilter
   role: EnumRoleWithAggregatesFilter
   status: EnumUserStatusWithAggregatesFilter
@@ -2925,14 +2969,15 @@ input ProfileScalarWhereWithAggregatesInput {
 }
 
 input ProfileUpdateInput {
-  bussiness: BussinessUpdateOneRequiredWithoutUserProfilesInput
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitUpdateManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCreatedByInput
+  bussiness: BussinessUpdateOneWithoutProfilesInput
+  bussinessUnits: BussinessUnitUpdateOneWithoutProfilesInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
   createdInvitations: ProfileUpdateManyWithoutInvitatedByInput
   invitatedBy: ProfileUpdateOneWithoutCreatedInvitationsInput
+  invitationDate: NullableDateTimeFieldUpdateOperationsInput
+  invitationExpiry: NullableDateTimeFieldUpdateOperationsInput
+  invitationHashCode: NullableStringFieldUpdateOperationsInput
+  invitationStatus: EnumInvitationStatusFieldUpdateOperationsInput
   profileType: EnumBussinessTypeFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
   status: EnumUserStatusFieldUpdateOperationsInput
@@ -2941,8 +2986,11 @@ input ProfileUpdateInput {
 }
 
 input ProfileUpdateManyMutationInput {
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
   createdAt: DateTimeFieldUpdateOperationsInput
+  invitationDate: NullableDateTimeFieldUpdateOperationsInput
+  invitationExpiry: NullableDateTimeFieldUpdateOperationsInput
+  invitationHashCode: NullableStringFieldUpdateOperationsInput
+  invitationStatus: EnumInvitationStatusFieldUpdateOperationsInput
   profileType: EnumBussinessTypeFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
   status: EnumUserStatusFieldUpdateOperationsInput
@@ -2987,6 +3035,7 @@ input ProfileUpdateManyWithoutBussinessUnitsInput {
   connect: [ProfileWhereUniqueInput!]
   connectOrCreate: [ProfileCreateOrConnectWithoutBussinessUnitsInput!]
   create: [ProfileCreateWithoutBussinessUnitsInput!]
+  createMany: ProfileCreateManyBussinessUnitsInputEnvelope
   delete: [ProfileWhereUniqueInput!]
   deleteMany: [ProfileScalarWhereInput!]
   disconnect: [ProfileWhereUniqueInput!]
@@ -3024,22 +3073,6 @@ input ProfileUpdateManyWithoutUserInput {
   upsert: [ProfileUpsertWithWhereUniqueWithoutUserInput!]
 }
 
-input ProfileUpdateOneRequiredWithoutCraetedBussinessUnitsInput {
-  connect: ProfileWhereUniqueInput
-  connectOrCreate: ProfileCreateOrConnectWithoutCraetedBussinessUnitsInput
-  create: ProfileCreateWithoutCraetedBussinessUnitsInput
-  update: ProfileUpdateWithoutCraetedBussinessUnitsInput
-  upsert: ProfileUpsertWithoutCraetedBussinessUnitsInput
-}
-
-input ProfileUpdateOneRequiredWithoutCreatedBussinessInput {
-  connect: ProfileWhereUniqueInput
-  connectOrCreate: ProfileCreateOrConnectWithoutCreatedBussinessInput
-  create: ProfileCreateWithoutCreatedBussinessInput
-  update: ProfileUpdateWithoutCreatedBussinessInput
-  upsert: ProfileUpsertWithoutCreatedBussinessInput
-}
-
 input ProfileUpdateOneWithoutCreatedInvitationsInput {
   connect: ProfileWhereUniqueInput
   connectOrCreate: ProfileCreateOrConnectWithoutCreatedInvitationsInput
@@ -3071,13 +3104,14 @@ input ProfileUpdateWithWhereUniqueWithoutUserInput {
 }
 
 input ProfileUpdateWithoutBussinessInput {
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitUpdateManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCreatedByInput
+  bussinessUnits: BussinessUnitUpdateOneWithoutProfilesInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
   createdInvitations: ProfileUpdateManyWithoutInvitatedByInput
   invitatedBy: ProfileUpdateOneWithoutCreatedInvitationsInput
+  invitationDate: NullableDateTimeFieldUpdateOperationsInput
+  invitationExpiry: NullableDateTimeFieldUpdateOperationsInput
+  invitationHashCode: NullableStringFieldUpdateOperationsInput
+  invitationStatus: EnumInvitationStatusFieldUpdateOperationsInput
   profileType: EnumBussinessTypeFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
   status: EnumUserStatusFieldUpdateOperationsInput
@@ -3086,43 +3120,14 @@ input ProfileUpdateWithoutBussinessInput {
 }
 
 input ProfileUpdateWithoutBussinessUnitsInput {
-  bussiness: BussinessUpdateOneRequiredWithoutUserProfilesInput
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
-  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCreatedByInput
-  createdAt: DateTimeFieldUpdateOperationsInput
-  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
-  createdInvitations: ProfileUpdateManyWithoutInvitatedByInput
-  invitatedBy: ProfileUpdateOneWithoutCreatedInvitationsInput
-  profileType: EnumBussinessTypeFieldUpdateOperationsInput
-  role: EnumRoleFieldUpdateOperationsInput
-  status: EnumUserStatusFieldUpdateOperationsInput
-  updatedAt: DateTimeFieldUpdateOperationsInput
-  user: UserUpdateOneRequiredWithoutProfilesInput
-}
-
-input ProfileUpdateWithoutCraetedBussinessUnitsInput {
-  bussiness: BussinessUpdateOneRequiredWithoutUserProfilesInput
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitUpdateManyWithoutUserProfilesInput
-  createdAt: DateTimeFieldUpdateOperationsInput
-  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
-  createdInvitations: ProfileUpdateManyWithoutInvitatedByInput
-  invitatedBy: ProfileUpdateOneWithoutCreatedInvitationsInput
-  profileType: EnumBussinessTypeFieldUpdateOperationsInput
-  role: EnumRoleFieldUpdateOperationsInput
-  status: EnumUserStatusFieldUpdateOperationsInput
-  updatedAt: DateTimeFieldUpdateOperationsInput
-  user: UserUpdateOneRequiredWithoutProfilesInput
-}
-
-input ProfileUpdateWithoutCreatedBussinessInput {
-  bussiness: BussinessUpdateOneRequiredWithoutUserProfilesInput
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitUpdateManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCreatedByInput
+  bussiness: BussinessUpdateOneWithoutProfilesInput
   createdAt: DateTimeFieldUpdateOperationsInput
   createdInvitations: ProfileUpdateManyWithoutInvitatedByInput
   invitatedBy: ProfileUpdateOneWithoutCreatedInvitationsInput
+  invitationDate: NullableDateTimeFieldUpdateOperationsInput
+  invitationExpiry: NullableDateTimeFieldUpdateOperationsInput
+  invitationHashCode: NullableStringFieldUpdateOperationsInput
+  invitationStatus: EnumInvitationStatusFieldUpdateOperationsInput
   profileType: EnumBussinessTypeFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
   status: EnumUserStatusFieldUpdateOperationsInput
@@ -3131,13 +3136,14 @@ input ProfileUpdateWithoutCreatedBussinessInput {
 }
 
 input ProfileUpdateWithoutCreatedInvitationsInput {
-  bussiness: BussinessUpdateOneRequiredWithoutUserProfilesInput
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitUpdateManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCreatedByInput
+  bussiness: BussinessUpdateOneWithoutProfilesInput
+  bussinessUnits: BussinessUnitUpdateOneWithoutProfilesInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
   invitatedBy: ProfileUpdateOneWithoutCreatedInvitationsInput
+  invitationDate: NullableDateTimeFieldUpdateOperationsInput
+  invitationExpiry: NullableDateTimeFieldUpdateOperationsInput
+  invitationHashCode: NullableStringFieldUpdateOperationsInput
+  invitationStatus: EnumInvitationStatusFieldUpdateOperationsInput
   profileType: EnumBussinessTypeFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
   status: EnumUserStatusFieldUpdateOperationsInput
@@ -3146,13 +3152,14 @@ input ProfileUpdateWithoutCreatedInvitationsInput {
 }
 
 input ProfileUpdateWithoutInvitatedByInput {
-  bussiness: BussinessUpdateOneRequiredWithoutUserProfilesInput
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitUpdateManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCreatedByInput
+  bussiness: BussinessUpdateOneWithoutProfilesInput
+  bussinessUnits: BussinessUnitUpdateOneWithoutProfilesInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
   createdInvitations: ProfileUpdateManyWithoutInvitatedByInput
+  invitationDate: NullableDateTimeFieldUpdateOperationsInput
+  invitationExpiry: NullableDateTimeFieldUpdateOperationsInput
+  invitationHashCode: NullableStringFieldUpdateOperationsInput
+  invitationStatus: EnumInvitationStatusFieldUpdateOperationsInput
   profileType: EnumBussinessTypeFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
   status: EnumUserStatusFieldUpdateOperationsInput
@@ -3161,23 +3168,19 @@ input ProfileUpdateWithoutInvitatedByInput {
 }
 
 input ProfileUpdateWithoutUserInput {
-  bussiness: BussinessUpdateOneRequiredWithoutUserProfilesInput
-  bussinessUnitIDs: ProfileUpdatebussinessUnitIDsInput
-  bussinessUnits: BussinessUnitUpdateManyWithoutUserProfilesInput
-  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCreatedByInput
+  bussiness: BussinessUpdateOneWithoutProfilesInput
+  bussinessUnits: BussinessUnitUpdateOneWithoutProfilesInput
   createdAt: DateTimeFieldUpdateOperationsInput
-  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
   createdInvitations: ProfileUpdateManyWithoutInvitatedByInput
   invitatedBy: ProfileUpdateOneWithoutCreatedInvitationsInput
+  invitationDate: NullableDateTimeFieldUpdateOperationsInput
+  invitationExpiry: NullableDateTimeFieldUpdateOperationsInput
+  invitationHashCode: NullableStringFieldUpdateOperationsInput
+  invitationStatus: EnumInvitationStatusFieldUpdateOperationsInput
   profileType: EnumBussinessTypeFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
   status: EnumUserStatusFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
-}
-
-input ProfileUpdatebussinessUnitIDsInput {
-  push: [String!]
-  set: [String!]
 }
 
 input ProfileUpsertWithWhereUniqueWithoutBussinessInput {
@@ -3204,19 +3207,15 @@ input ProfileUpsertWithWhereUniqueWithoutUserInput {
   where: ProfileWhereUniqueInput!
 }
 
-input ProfileUpsertWithoutCraetedBussinessUnitsInput {
-  create: ProfileCreateWithoutCraetedBussinessUnitsInput!
-  update: ProfileUpdateWithoutCraetedBussinessUnitsInput!
-}
-
-input ProfileUpsertWithoutCreatedBussinessInput {
-  create: ProfileCreateWithoutCreatedBussinessInput!
-  update: ProfileUpdateWithoutCreatedBussinessInput!
-}
-
 input ProfileUpsertWithoutCreatedInvitationsInput {
   create: ProfileCreateWithoutCreatedInvitationsInput!
   update: ProfileUpdateWithoutCreatedInvitationsInput!
+}
+
+input ProfileUserIdBussinessIdBussinessUnitIdCompoundUniqueInput {
+  bussinessId: String!
+  bussinessUnitId: String!
+  userId: String!
 }
 
 input ProfileWhereInput {
@@ -3224,16 +3223,18 @@ input ProfileWhereInput {
   NOT: [ProfileWhereInput!]
   OR: [ProfileWhereInput!]
   bussiness: BussinessRelationFilter
-  bussinessId: StringFilter
-  bussinessUnitIDs: StringNullableListFilter
-  bussinessUnits: BussinessUnitListRelationFilter
-  craetedBussinessUnits: BussinessUnitListRelationFilter
+  bussinessId: StringNullableFilter
+  bussinessUnitId: StringNullableFilter
+  bussinessUnits: BussinessUnitRelationFilter
   createdAt: DateTimeFilter
-  createdBussiness: BussinessListRelationFilter
   createdInvitations: ProfileListRelationFilter
   id: StringFilter
   invitatedBy: ProfileRelationFilter
   invitatedById: StringNullableFilter
+  invitationDate: DateTimeNullableFilter
+  invitationExpiry: DateTimeNullableFilter
+  invitationHashCode: StringNullableFilter
+  invitationStatus: EnumInvitationStatusFilter
   profileType: EnumBussinessTypeFilter
   role: EnumRoleFilter
   status: EnumUserStatusFilter
@@ -3244,6 +3245,7 @@ input ProfileWhereInput {
 
 input ProfileWhereUniqueInput {
   id: String
+  userId_bussinessId_bussinessUnitId: ProfileUserIdBussinessIdBussinessUnitIdCompoundUniqueInput
 }
 
 type Query {
@@ -3285,15 +3287,15 @@ enum QueryMode {
 }
 
 enum Role {
-  ListingAgent
+  Agent
   ListingManager
-  ListingOwner
-  ListingUser
+  Manager
+  Owner
   QCAnalysit
   QCApprover
-  QCManager
-  QCOwner
-  QCUser
+  Trader
+  TradingManager
+  WarehouseManager
 }
 
 type SocialMedia {
@@ -3411,14 +3413,6 @@ input StringNullableFilter {
   startsWith: String
 }
 
-input StringNullableListFilter {
-  equals: [String!]
-  has: String
-  hasEvery: [String!]
-  hasSome: [String!]
-  isEmpty: Boolean
-}
-
 input StringNullableWithAggregatesFilter {
   _count: NestedIntNullableFilter
   _max: NestedStringNullableFilter
@@ -3465,13 +3459,13 @@ enum SubscriptionStatus {
 }
 
 type SubscriptionType {
-  PaymentSubscriptions(cursor: PaymentSubscriptionWhereUniqueInput, distinct: [PaymentSubscriptionScalarFieldEnum!], orderBy: [PaymentSubscriptionOrderByWithRelationInput!], skip: Int, take: Int, where: PaymentSubscriptionWhereInput): [PaymentSubscription!]!
   _count: SubscriptionTypeCount
   count: Int
   createdAt: DateTime!
   description: String
   id: String!
   name: String!
+  paymentSubscriptions(cursor: PaymentSubscriptionWhereUniqueInput, distinct: [PaymentSubscriptionScalarFieldEnum!], orderBy: [PaymentSubscriptionOrderByWithRelationInput!], skip: Int, take: Int, where: PaymentSubscriptionWhereInput): [PaymentSubscription!]!
   price: String
   updatedAt: DateTime!
 }
@@ -3485,7 +3479,7 @@ input SubscriptionTypeAvgOrderByAggregateInput {
 }
 
 type SubscriptionTypeCount {
-  PaymentSubscriptions: Int!
+  paymentSubscriptions: Int!
 }
 
 type SubscriptionTypeCountAggregate {
@@ -3510,12 +3504,12 @@ input SubscriptionTypeCountOrderByAggregateInput {
 }
 
 input SubscriptionTypeCreateInput {
-  PaymentSubscriptions: PaymentSubscriptionCreateNestedManyWithoutLastSubscriptionTypeInput
   count: Int
   createdAt: DateTime
   description: String
   id: String
   name: String!
+  paymentSubscriptions: PaymentSubscriptionCreateNestedManyWithoutLastSubscriptionTypeInput
   price: String
   updatedAt: DateTime
 }
@@ -3622,12 +3616,12 @@ input SubscriptionTypeOrderByWithAggregationInput {
 }
 
 input SubscriptionTypeOrderByWithRelationInput {
-  PaymentSubscriptions: PaymentSubscriptionOrderByRelationAggregateInput
   count: SortOrder
   createdAt: SortOrder
   description: SortOrder
   id: SortOrder
   name: SortOrder
+  paymentSubscriptions: PaymentSubscriptionOrderByRelationAggregateInput
   price: SortOrder
   updatedAt: SortOrder
 }
@@ -3669,11 +3663,11 @@ input SubscriptionTypeSumOrderByAggregateInput {
 }
 
 input SubscriptionTypeUpdateInput {
-  PaymentSubscriptions: PaymentSubscriptionUpdateManyWithoutLastSubscriptionTypeInput
   count: NullableIntFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
   description: NullableStringFieldUpdateOperationsInput
   name: StringFieldUpdateOperationsInput
+  paymentSubscriptions: PaymentSubscriptionUpdateManyWithoutLastSubscriptionTypeInput
   price: NullableStringFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
 }
@@ -3715,12 +3709,12 @@ input SubscriptionTypeWhereInput {
   AND: [SubscriptionTypeWhereInput!]
   NOT: [SubscriptionTypeWhereInput!]
   OR: [SubscriptionTypeWhereInput!]
-  PaymentSubscriptions: PaymentSubscriptionListRelationFilter
   count: IntNullableFilter
   createdAt: DateTimeFilter
   description: StringNullableFilter
   id: StringFilter
   name: StringFilter
+  paymentSubscriptions: PaymentSubscriptionListRelationFilter
   price: StringNullableFilter
   updatedAt: DateTimeFilter
 }
@@ -3735,7 +3729,9 @@ type User {
   aadhaarMobile: String
   address: [Address!]!
   contacts: [ContactNumber!]!
+  craetedBussinessUnits(cursor: BussinessUnitWhereUniqueInput, distinct: [BussinessUnitScalarFieldEnum!], orderBy: [BussinessUnitOrderByWithRelationInput!], skip: Int, take: Int, where: BussinessUnitWhereInput): [BussinessUnit!]!
   createdAt: DateTime!
+  createdBussiness(cursor: BussinessWhereUniqueInput, distinct: [BussinessScalarFieldEnum!], orderBy: [BussinessOrderByWithRelationInput!], skip: Int, take: Int, where: BussinessWhereInput): [Bussiness!]!
   email: String
   firstName: String
   id: String!
@@ -3743,13 +3739,15 @@ type User {
   isEmailVerified: Boolean!
   isMobileVerified: Boolean!
   lastName: String
-  mobile: String
+  mobile: String!
   panCard: Doc
   profiles(cursor: ProfileWhereUniqueInput, distinct: [ProfileScalarFieldEnum!], orderBy: [ProfileOrderByWithRelationInput!], skip: Int, take: Int, where: ProfileWhereInput): [Profile!]!
   updatedAt: DateTime!
 }
 
 type UserCount {
+  craetedBussinessUnits: Int!
+  createdBussiness: Int!
   profiles: Int!
 }
 
@@ -3787,7 +3785,9 @@ input UserCreateInput {
   aadhaarMobile: String
   address: [AddressCreateInput!]
   contacts: [ContactNumberCreateInput!]
+  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCCreatedByInput
   createdAt: DateTime
+  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
   email: String
   firstName: String
   id: String
@@ -3795,7 +3795,7 @@ input UserCreateInput {
   isEmailVerified: Boolean
   isMobileVerified: Boolean
   lastName: String
-  mobile: String
+  mobile: String!
   panCard: DocNullableCreateEnvelopeInput
   profiles: ProfileCreateNestedManyWithoutUserInput
   updatedAt: DateTime
@@ -3814,9 +3814,21 @@ input UserCreateManyInput {
   isEmailVerified: Boolean
   isMobileVerified: Boolean
   lastName: String
-  mobile: String
+  mobile: String!
   panCard: DocNullableCreateEnvelopeInput
   updatedAt: DateTime
+}
+
+input UserCreateNestedOneWithoutCraetedBussinessUnitsInput {
+  connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutCraetedBussinessUnitsInput
+  create: UserCreateWithoutCraetedBussinessUnitsInput
+}
+
+input UserCreateNestedOneWithoutCreatedBussinessInput {
+  connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutCreatedBussinessInput
+  create: UserCreateWithoutCreatedBussinessInput
 }
 
 input UserCreateNestedOneWithoutProfilesInput {
@@ -3825,16 +3837,47 @@ input UserCreateNestedOneWithoutProfilesInput {
   create: UserCreateWithoutProfilesInput
 }
 
+input UserCreateOrConnectWithoutCraetedBussinessUnitsInput {
+  create: UserCreateWithoutCraetedBussinessUnitsInput!
+  where: UserWhereUniqueInput!
+}
+
+input UserCreateOrConnectWithoutCreatedBussinessInput {
+  create: UserCreateWithoutCreatedBussinessInput!
+  where: UserWhereUniqueInput!
+}
+
 input UserCreateOrConnectWithoutProfilesInput {
   create: UserCreateWithoutProfilesInput!
   where: UserWhereUniqueInput!
 }
 
-input UserCreateWithoutProfilesInput {
+input UserCreateWithoutCraetedBussinessUnitsInput {
   aadhaar: DocNullableCreateEnvelopeInput
   aadhaarMobile: String
   address: [AddressCreateInput!]
   contacts: [ContactNumberCreateInput!]
+  createdAt: DateTime
+  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
+  email: String
+  firstName: String
+  id: String
+  image: String
+  isEmailVerified: Boolean
+  isMobileVerified: Boolean
+  lastName: String
+  mobile: String!
+  panCard: DocNullableCreateEnvelopeInput
+  profiles: ProfileCreateNestedManyWithoutUserInput
+  updatedAt: DateTime
+}
+
+input UserCreateWithoutCreatedBussinessInput {
+  aadhaar: DocNullableCreateEnvelopeInput
+  aadhaarMobile: String
+  address: [AddressCreateInput!]
+  contacts: [ContactNumberCreateInput!]
+  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCCreatedByInput
   createdAt: DateTime
   email: String
   firstName: String
@@ -3843,15 +3886,30 @@ input UserCreateWithoutProfilesInput {
   isEmailVerified: Boolean
   isMobileVerified: Boolean
   lastName: String
-  mobile: String
+  mobile: String!
   panCard: DocNullableCreateEnvelopeInput
+  profiles: ProfileCreateNestedManyWithoutUserInput
   updatedAt: DateTime
 }
 
-input UserEmailMobileAadhaarMobileCompoundUniqueInput {
-  aadhaarMobile: String!
-  email: String!
+input UserCreateWithoutProfilesInput {
+  aadhaar: DocNullableCreateEnvelopeInput
+  aadhaarMobile: String
+  address: [AddressCreateInput!]
+  contacts: [ContactNumberCreateInput!]
+  craetedBussinessUnits: BussinessUnitCreateNestedManyWithoutCCreatedByInput
+  createdAt: DateTime
+  createdBussiness: BussinessCreateNestedManyWithoutCreatedByInput
+  email: String
+  firstName: String
+  id: String
+  image: String
+  isEmailVerified: Boolean
+  isMobileVerified: Boolean
+  lastName: String
   mobile: String!
+  panCard: DocNullableCreateEnvelopeInput
+  updatedAt: DateTime
 }
 
 input UserEmailMobileCompoundUniqueInput {
@@ -3872,7 +3930,7 @@ type UserGroupBy {
   isEmailVerified: Boolean!
   isMobileVerified: Boolean!
   lastName: String
-  mobile: String
+  mobile: String!
   updatedAt: DateTime!
 }
 
@@ -3954,7 +4012,9 @@ input UserOrderByWithRelationInput {
   aadhaarMobile: SortOrder
   address: AddressOrderByCompositeAggregateInput
   contacts: ContactNumberOrderByCompositeAggregateInput
+  craetedBussinessUnits: BussinessUnitOrderByRelationAggregateInput
   createdAt: SortOrder
+  createdBussiness: BussinessOrderByRelationAggregateInput
   email: SortOrder
   firstName: SortOrder
   id: SortOrder
@@ -4000,7 +4060,7 @@ input UserScalarWhereWithAggregatesInput {
   isEmailVerified: BoolWithAggregatesFilter
   isMobileVerified: BoolWithAggregatesFilter
   lastName: StringNullableWithAggregatesFilter
-  mobile: StringNullableWithAggregatesFilter
+  mobile: StringWithAggregatesFilter
   updatedAt: DateTimeWithAggregatesFilter
 }
 
@@ -4017,14 +4077,16 @@ input UserUpdateInput {
   aadhaarMobile: NullableStringFieldUpdateOperationsInput
   address: [AddressCreateInput!]
   contacts: [ContactNumberCreateInput!]
+  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCCreatedByInput
   createdAt: DateTimeFieldUpdateOperationsInput
+  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
   email: NullableStringFieldUpdateOperationsInput
   firstName: NullableStringFieldUpdateOperationsInput
   image: NullableStringFieldUpdateOperationsInput
   isEmailVerified: BoolFieldUpdateOperationsInput
   isMobileVerified: BoolFieldUpdateOperationsInput
   lastName: NullableStringFieldUpdateOperationsInput
-  mobile: NullableStringFieldUpdateOperationsInput
+  mobile: StringFieldUpdateOperationsInput
   panCard: DocNullableUpdateEnvelopeInput
   profiles: ProfileUpdateManyWithoutUserInput
   updatedAt: DateTimeFieldUpdateOperationsInput
@@ -4042,9 +4104,17 @@ input UserUpdateManyMutationInput {
   isEmailVerified: BoolFieldUpdateOperationsInput
   isMobileVerified: BoolFieldUpdateOperationsInput
   lastName: NullableStringFieldUpdateOperationsInput
-  mobile: NullableStringFieldUpdateOperationsInput
+  mobile: StringFieldUpdateOperationsInput
   panCard: DocNullableUpdateEnvelopeInput
   updatedAt: DateTimeFieldUpdateOperationsInput
+}
+
+input UserUpdateOneRequiredWithoutCreatedBussinessInput {
+  connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutCreatedBussinessInput
+  create: UserCreateWithoutCreatedBussinessInput
+  update: UserUpdateWithoutCreatedBussinessInput
+  upsert: UserUpsertWithoutCreatedBussinessInput
 }
 
 input UserUpdateOneRequiredWithoutProfilesInput {
@@ -4055,11 +4125,41 @@ input UserUpdateOneRequiredWithoutProfilesInput {
   upsert: UserUpsertWithoutProfilesInput
 }
 
-input UserUpdateWithoutProfilesInput {
+input UserUpdateOneWithoutCraetedBussinessUnitsInput {
+  connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutCraetedBussinessUnitsInput
+  create: UserCreateWithoutCraetedBussinessUnitsInput
+  delete: Boolean
+  disconnect: Boolean
+  update: UserUpdateWithoutCraetedBussinessUnitsInput
+  upsert: UserUpsertWithoutCraetedBussinessUnitsInput
+}
+
+input UserUpdateWithoutCraetedBussinessUnitsInput {
   aadhaar: DocNullableUpdateEnvelopeInput
   aadhaarMobile: NullableStringFieldUpdateOperationsInput
   address: [AddressCreateInput!]
   contacts: [ContactNumberCreateInput!]
+  createdAt: DateTimeFieldUpdateOperationsInput
+  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
+  email: NullableStringFieldUpdateOperationsInput
+  firstName: NullableStringFieldUpdateOperationsInput
+  image: NullableStringFieldUpdateOperationsInput
+  isEmailVerified: BoolFieldUpdateOperationsInput
+  isMobileVerified: BoolFieldUpdateOperationsInput
+  lastName: NullableStringFieldUpdateOperationsInput
+  mobile: StringFieldUpdateOperationsInput
+  panCard: DocNullableUpdateEnvelopeInput
+  profiles: ProfileUpdateManyWithoutUserInput
+  updatedAt: DateTimeFieldUpdateOperationsInput
+}
+
+input UserUpdateWithoutCreatedBussinessInput {
+  aadhaar: DocNullableUpdateEnvelopeInput
+  aadhaarMobile: NullableStringFieldUpdateOperationsInput
+  address: [AddressCreateInput!]
+  contacts: [ContactNumberCreateInput!]
+  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCCreatedByInput
   createdAt: DateTimeFieldUpdateOperationsInput
   email: NullableStringFieldUpdateOperationsInput
   firstName: NullableStringFieldUpdateOperationsInput
@@ -4067,9 +4167,39 @@ input UserUpdateWithoutProfilesInput {
   isEmailVerified: BoolFieldUpdateOperationsInput
   isMobileVerified: BoolFieldUpdateOperationsInput
   lastName: NullableStringFieldUpdateOperationsInput
-  mobile: NullableStringFieldUpdateOperationsInput
+  mobile: StringFieldUpdateOperationsInput
+  panCard: DocNullableUpdateEnvelopeInput
+  profiles: ProfileUpdateManyWithoutUserInput
+  updatedAt: DateTimeFieldUpdateOperationsInput
+}
+
+input UserUpdateWithoutProfilesInput {
+  aadhaar: DocNullableUpdateEnvelopeInput
+  aadhaarMobile: NullableStringFieldUpdateOperationsInput
+  address: [AddressCreateInput!]
+  contacts: [ContactNumberCreateInput!]
+  craetedBussinessUnits: BussinessUnitUpdateManyWithoutCCreatedByInput
+  createdAt: DateTimeFieldUpdateOperationsInput
+  createdBussiness: BussinessUpdateManyWithoutCreatedByInput
+  email: NullableStringFieldUpdateOperationsInput
+  firstName: NullableStringFieldUpdateOperationsInput
+  image: NullableStringFieldUpdateOperationsInput
+  isEmailVerified: BoolFieldUpdateOperationsInput
+  isMobileVerified: BoolFieldUpdateOperationsInput
+  lastName: NullableStringFieldUpdateOperationsInput
+  mobile: StringFieldUpdateOperationsInput
   panCard: DocNullableUpdateEnvelopeInput
   updatedAt: DateTimeFieldUpdateOperationsInput
+}
+
+input UserUpsertWithoutCraetedBussinessUnitsInput {
+  create: UserCreateWithoutCraetedBussinessUnitsInput!
+  update: UserUpdateWithoutCraetedBussinessUnitsInput!
+}
+
+input UserUpsertWithoutCreatedBussinessInput {
+  create: UserCreateWithoutCreatedBussinessInput!
+  update: UserUpdateWithoutCreatedBussinessInput!
 }
 
 input UserUpsertWithoutProfilesInput {
@@ -4085,7 +4215,9 @@ input UserWhereInput {
   aadhaarMobile: StringNullableFilter
   address: [AddressObjectEqualityInput!]
   contacts: [ContactNumberObjectEqualityInput!]
+  craetedBussinessUnits: BussinessUnitListRelationFilter
   createdAt: DateTimeFilter
+  createdBussiness: BussinessListRelationFilter
   email: StringNullableFilter
   firstName: StringNullableFilter
   id: StringFilter
@@ -4093,7 +4225,7 @@ input UserWhereInput {
   isEmailVerified: BoolFilter
   isMobileVerified: BoolFilter
   lastName: StringNullableFilter
-  mobile: StringNullableFilter
+  mobile: StringFilter
   panCard: DocNullableCompositeFilter
   profiles: ProfileListRelationFilter
   updatedAt: DateTimeFilter
@@ -4101,8 +4233,8 @@ input UserWhereInput {
 
 input UserWhereUniqueInput {
   email_mobile: UserEmailMobileCompoundUniqueInput
-  email_mobile_aadhaarMobile: UserEmailMobileAadhaarMobileCompoundUniqueInput
   id: String
+  mobile: String
 }
 
 input contactInfoNullableCreateEnvelopeInput {

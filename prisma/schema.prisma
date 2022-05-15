@@ -22,7 +22,7 @@ model User {
   id               String  @id @default(auto()) @map("_id") @db.ObjectId
   email            String?
   isEmailVerified  Boolean @default(false)
-  mobile           String
+  mobile           String  @unique
   isMobileVerified Boolean @default(false)
 
   firstName String?
@@ -30,7 +30,7 @@ model User {
   image     String?
 
   //** user have multiple profile */
-  Profiles  Profile[]
+  profiles Profile[]
 
   aadhaarMobile String?
   aadhaar       Doc?
@@ -40,30 +40,39 @@ model User {
   contacts ContactNumber[]
 
   //** created by user */
-  CreatedBussiness      Bussiness[]     @relation("bussiness")
-  CraetedBussinessUnits BussinessUnit[] @relation("bussinessUnits")
+  createdBusiness      Business[]     @relation("business")
+  craetedBusinessUnits BusinessUnit[] @relation("businessUnits")
+
+  //** Faverite commodities */
+  favoriteCommodity FavoriteCommodity[]
+
+  //** All invoice created by this user */
+  invoices Invoice[] @relation("user_invoices")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  //** Compond Unique Constraints **//
+  isActive  Boolean @default(true)
+  isDeleted Boolean @default(false)
+
   @@unique([email, mobile, aadhaar.number])
   @@unique([email, mobile])
 }
 
 model Profile {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  profileType BussinessType
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  //* @TODO we need to specify the roles with the business types and remove the Business Type enum */
+  profileType BusinessType
   status      UserStatus // owner verification pending, invited, active, otp verification pending, blocked
-  
+
   //* A profile can have a role */
-  //** In feature a profile can have multiple roles */
-  role        Role
-  
+  //**  @TODO profile can have multiple roles */
+  role Role
+
 
   // user profile relatioship 1-M
   userId String @db.ObjectId
-  User   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
 
   //** invitations mangement */
   invitatedById      String?          @db.ObjectId
@@ -73,92 +82,290 @@ model Profile {
   invitationDate     DateTime?
   invitationExpiry   DateTime?
 
-  CreatedInvitations Profile[] @relation("invitations")
+  createdInvitations Profile[] @relation("invitations")
 
 
-  // profile bussiness relatioship M-1
-  bussinessId String    @db.ObjectId @unique
-  bussiness   Bussiness @relation(fields: [bussinessId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  // profile business relatioship M-1
+  businessId String?   @db.ObjectId
+  business   Business? @relation(fields: [businessId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  // profile bussinessUnit relatioship M-1
-  bussinessUnitId String        @db.ObjectId @unique
-  BussinessUnits   BussinessUnit @relation(fields: [bussinessUnitId], references: [id])
+  // profile businessUnit relatioship M-1
+  businessUnitId String?       @db.ObjectId
+  businessUnits  BusinessUnit? @relation(fields: [businessUnitId], references: [id])
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  paymentSubscription PaymentSubscription[] @relation("paymentSubscriptions")
+  //** All invoice created by this profile */
+  invoices            Invoice[]             @relation("profile_invoices")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isActive  Boolean @default(true)
+  isDeleted Boolean @default(false)
+
+
+  @@unique([userId, businessId, businessUnitId])
 }
 
-model Bussiness {
+model Business {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   GSTIN               String
-  LeagalName          String          @unique
-  displayName         String          @unique
+  leagalName          String         @unique
+  displayName         String         @unique
   description         String?
-  image               String?
+  logo                String?
   dateOfIncorporation DateTime?
   constitution        String?
   address             Address?
   contactInfo         contactInfo?
-  status              BussinessStatus
+  status              BusinessStatus @default(Active)
+  // preferred to use calculatiom methord instead of this field
+  remainingCount      Int?           @default(0)
 
-  Profiles     Profile[]
-  PaymentSubscription PaymentSubscription[]
-  BussinessUnits      BussinessUnit[]
+
+  //** dummy relations for prisma */
+  //** business have multiple business units in QC  */
+  businessUnits       BusinessUnit[]
+  //** business profile relationship 1-M */
+  profiles            Profile[]
+  //** Subscriptions Payments (active & history records) */
+  paymentSubscription PaymentSubscription[]
+  //** All invoice created by this business */
+  invoices            Invoice[]             @relation("business_invoices")
+  Coupon              Coupon[]
+  TopupPayment        TopupPayment[]
+
 
   createdById String   @db.ObjectId
-  createdBy   User     @relation("bussiness", fields: [createdById], references: [id])
+  createdBy   User     @relation("business", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
+  isActive  Boolean @default(false)
+  isDeleted Boolean @default(false)
 }
 
 // branch/warehouse/sub entity  -- only valid for QC
-model BussinessUnit {
+model BusinessUnit {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
   image       String?
 
-  bussinessUnitType BussinessUnitType
+  businessUnitType BusinessUnitType
 
   address     Address?
   contactInfo contactInfo?
-  status      BussinessStatus
+  status      BusinessStatus
 
-  bussinessId String    @db.ObjectId
-  Bussiness   Bussiness @relation(fields: [bussinessId], references: [id])
-  Profiles    Profile[]
+  businessId String    @db.ObjectId
+  business   Business  @relation(fields: [businessId], references: [id])
+  profiles   Profile[]
 
   createdById String   @db.ObjectId
-  CreatedBy   User?    @relation("bussinessUnits", fields: [createdById], references: [id])
+  cCreatedBy  User?    @relation("businessUnits", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
+  isActive  Boolean @default(true)
+  isDeleted Boolean @default(false)
+
+}
+
+model Invoice {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  invoiceNumber      String
+  invoiceDate        DateTime
+  invoiceAmount      Float
+  GSTAmount          Float
+  TotalAmount        Float
+  invoiceStatus      InvoiceStatus
+  paymentStatus      PaymentStatus
+  transactionDetails TransactionDetail[]
+
+  //** invoice items */
+  subscriptions PaymentSubscription[] @relation("invoices")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isActive  Boolean @default(true)
+  isDeleted Boolean @default(false)
+
+  //** Invoice relations */
+  createdByUserId String         @db.ObjectId
+  createdByUser   User           @relation("user_invoices", fields: [createdByUserId], references: [id])
+  Profile         Profile?       @relation("profile_invoices", fields: [profileId], references: [id])
+  profileId       String?        @db.ObjectId
+  Business        Business?      @relation("business_invoices", fields: [businessId], references: [id])
+  businessId      String?        @db.ObjectId
+  TopupPayment    TopupPayment[]
 }
 
 model PaymentSubscription {
-  id                   String             @id @default(auto()) @map("_id") @db.ObjectId
-  bussinessId          String             @db.ObjectId
-  bussiness            Bussiness          @relation(fields: [bussinessId], references: [id])
-  subscriptionId       String             @db.ObjectId
-  lastSubscriptionType SubscriptionType?  @relation(fields: [subscriptionId], references: [id])
-  status               SubscriptionStatus
-  expiryDate           DateTime?
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  //** Bussiness subscription */
+  businessId String   @db.ObjectId
+  business   Business @relation(fields: [businessId], references: [id])
+
+  subscriptionPlanId String            @db.ObjectId
+  subscriptionPlan   SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id])
+
+  status     SubscriptionStatus
+  expiryDate DateTime?
+
+  //** Payment subscription Invoice */
+  invoiceId                  String?  @db.ObjectId
+  invoice                    Invoice? @relation("invoices", fields: [invoiceId], references: [id])
+  //** Invoice Item details */
+  subscriptionCount          Int?
+  subscriptionValidityInDays Int?
+  subscriptionAmount         Float?
+
+  createdById String   @db.ObjectId
+  createdBy   Profile  @relation("paymentSubscriptions", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SubscriptionPlan {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String?
+  price          String?
+  count          Int?
+  validityInDays Int?
+
+  //@TODO add the subscription type
+  //** applicable coupons */
+  couponIds String[] @db.ObjectId
+  coupons   Coupon[] @relation(fields: [couponIds], references: [id])
+
+  //** upgrade suggessions for subscription plans */
+  upgradablePlans SubscriptionPlan[] @relation("upgradablePlans")
+  basePlans       SubscriptionPlan?  @relation("upgradablePlans", fields: [basePlanIds], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  basePlanIds     String[]           @db.ObjectId
+
+  paymentSubscriptions PaymentSubscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isActive  Boolean @default(true)
+  isDeleted Boolean @default(false)
+}
+
+// ** Use normal subscription plan with a type is bettaer than  using Topup Payment & Topup Plan model*/
+model TopupPayment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  amount Float
+
+  paymentStatus PaymentStatus
+
+  //** topup Payment  Invoice */
+  invoiceId String?  @db.ObjectId
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+
+  //** topup plan relation */
+  topupPlanId String    @db.ObjectId
+  topupPlan   TopupPlan @relation(fields: [topupPlanId], references: [id])
+
+  //** topup bussiness invoice */
+  businessId String   @db.ObjectId
+  business   Business @relation(fields: [businessId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isActive  Boolean @default(true)
+  isDeleted Boolean @default(false)
+}
+
+model TopupPlan {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String?
+  price          String?
+  count          Int?
+  validityInDays Int?
+
+  //@TODO add the subscription type
+  //** applicable coupons */
+  couponIds String[] @db.ObjectId
+  coupons   Coupon[] @relation(fields: [couponIds], references: [id])
+
+  //** dummy relation for prisma */
+  topupPayments TopupPayment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isActive  Boolean @default(true)
+  isDeleted Boolean @default(false)
+}
+
+model Coupon {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  couponCode   String
+  description  String?
+  couponType   CouponType
+  couponValue  Float?
+  couponCount  Int?
+  couponStatus CouponStatus
+  couponExpiry DateTime?
+
+  //** Coupon applicable to subscription plans M-M*/
+  subscriptionPlanIds String[]           @db.ObjectId
+  subscriptionPlan    SubscriptionPlan[] @relation(fields: [subscriptionPlanIds], references: [id])
+
+  //** Coupon applicable to topup plans M-M*/
+  topupPlanIds String[]    @db.ObjectId
+  topupPlan    TopupPlan[] @relation(fields: [topupPlanIds], references: [id])
+
+  //** Coupon applicable to business , special coupons for perticular busines*/
+  businessId String    @db.ObjectId
+  business   Business? @relation(fields: [businessId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model SubscriptionType {
-  id                   String                @id @default(auto()) @map("_id") @db.ObjectId
-  name                 String
-  description          String?
-  price                String?
-  count                Int?
-  PaymentSubscriptions PaymentSubscription[]
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+model Commodity {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+  isDeleted   Boolean  @default(false)
+
+  //** https://github.com/prisma/prisma/issues/12552 */
+  favoriteUsers FavoriteCommodity[]
+}
+
+model FavoriteCommodity {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  commodity   Commodity @relation(fields: [commodityId], references: [id])
+  commodityId String    @db.ObjectId
+  User        User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, commodityId])
+}
+
+type TransactionDetail {
+  transactionId     String
+  transactionRefId  String
+  transactionStatus TransactionStatus
+  transactionAmount Float
+  transactionDate   DateTime
+  transactionType   TransactionType
+  transactionMode   TransactionMode
 }
 
 type ContactNumber {
@@ -168,9 +375,12 @@ type ContactNumber {
 }
 
 type Address {
-  type         String
+  label        String
   addressLine1 String
   addressLine2 String?
+  houseNo      String?
+  BuildingName String?
+  landMark     String?
   city         String
   state        String
   country      String
@@ -203,18 +413,15 @@ type SocialMedia {
 }
 
 enum InvitationStatus {
-  Pending
+  NotRequired
+  PendingOwnerApproval
+  PendingUserApproval
   Accepted
   Rejected
   Expired
 }
 
-enum BussinessType {
-  QC
-  Listing
-}
-
-enum BussinessUnitType {
+enum BusinessUnitType {
   Branch
   Warehouse
   SubEntity
@@ -228,7 +435,7 @@ enum UserStatus {
   otpVerificationPending
 }
 
-enum BussinessStatus {
+enum BusinessStatus {
   Active
   Deleted
   Approved
@@ -241,21 +448,76 @@ enum BussinessStatus {
 }
 
 enum SubscriptionStatus {
+  Expired
   Active
   Deleted
+  PaymentPending
+  PaymentFailed
+  Closed
+  Inactive
+}
+
+enum BusinessType {
+  QC
+  Listing
+  Trading
+}
+
+enum Role {
+  Owner
+  Manager
+  TradingManager
+  ListingManager
+  Trader
+  Agent
+  WarehouseManager
+  QCAnalysit
+  QCApprover
+}
+
+enum InvoiceStatus {
+  Draft
+  Paid
+  Cancelled
+  Rejected
   Pending
   Closed
   Inactive
 }
 
-enum Role {
-  ListingOwner
-  ListingManager
-  ListingAgent
-  ListingUser
-  QCOwner
-  QCUser
-  QCManager
-  QCAnalysit
-  QCApprover
+enum PaymentStatus {
+  Pending
+  Success
+  Failed
+  Cancelled
+  Expired
+}
+
+enum TransactionMode {
+  Online
+  Offline
+}
+
+enum TransactionType {
+  Payment
+  Refund
+}
+
+enum TransactionStatus {
+  Success
+  Failed
+  Cancelled
+  Expired
+}
+
+enum CouponType {
+  Percentage
+  Fixed
+}
+
+enum CouponStatus {
+  Active
+  Expired
+  Used
+  Deleted
 }
