@@ -44,10 +44,13 @@ model User {
   craetedBusinessUnits BusinessUnit[] @relation("businessUnits")
 
   //** Faverite commodities */
-  favoriteCommodity FavoriteCommodity[]
+  favoriteCommodityType FavoriteCommodityType[]
 
   //** All invoice created by this user */
   invoices Invoice[] @relation("user_invoices")
+  // owned Commodity list
+  commodity Commodity[]
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -97,6 +100,9 @@ model Profile {
   //** All invoice created by this profile */
   invoices            Invoice[]             @relation("profile_invoices")
 
+  // owned Commodity list
+  commodity Commodity[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -133,17 +139,20 @@ model Business {
   paymentSubscription PaymentSubscription[]
   //** All invoice created by this business */
   invoices            Invoice[]             @relation("business_invoices")
-  Coupon              Coupon[]
+  coupon              Coupon[]
   TopupPayment        TopupPayment[]
 
+  // owned Commodity list
+  commodity Commodity[]
 
   createdById String   @db.ObjectId
   createdBy   User     @relation("business", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  isActive  Boolean @default(false)
-  isDeleted Boolean @default(false)
+  isActive  Boolean     @default(false)
+  isDeleted Boolean     @default(false)
+  
 }
 
 // branch/warehouse/sub entity  -- only valid for QC
@@ -171,15 +180,20 @@ model BusinessUnit {
   isActive  Boolean @default(true)
   isDeleted Boolean @default(false)
 
+  // All commudity records on the were house
+  // relation ship
+  Commodity Commodity[]
 }
 
 model Invoice {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
+  invoiceType InvoiceType
+
   invoiceNumber      String
   invoiceDate        DateTime
   invoiceAmount      Float
-  GSTAmount          Float
+  GSTAmount          Float?              @default(0)
   TotalAmount        Float
   invoiceStatus      InvoiceStatus
   paymentStatus      PaymentStatus
@@ -187,7 +201,9 @@ model Invoice {
 
   //** invoice items */
   subscriptions PaymentSubscription[] @relation("invoices")
-  topupPayments    TopupPayment[]
+  topupPayments TopupPayment[]
+  BuyBid        BuyBid[]
+  SellOffer     SellOffer[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -196,13 +212,12 @@ model Invoice {
   isDeleted Boolean @default(false)
 
   //** Invoice relations */
-  createdByUserId String         @db.ObjectId
-  createdByUser   User           @relation("user_invoices", fields: [createdByUserId], references: [id])
-  Profile         Profile?       @relation("profile_invoices", fields: [profileId], references: [id])
-  profileId       String?        @db.ObjectId
-  Business        Business?      @relation("business_invoices", fields: [businessId], references: [id])
-  businessId      String?        @db.ObjectId
-  
+  createdByUserId String    @db.ObjectId
+  createdByUser   User      @relation("user_invoices", fields: [createdByUserId], references: [id])
+  Profile         Profile?  @relation("profile_invoices", fields: [profileId], references: [id])
+  profileId       String?   @db.ObjectId
+  Business        Business? @relation("business_invoices", fields: [businessId], references: [id])
+  businessId      String?   @db.ObjectId
 }
 
 model PaymentSubscription {
@@ -214,8 +229,9 @@ model PaymentSubscription {
   subscriptionPlanId String            @db.ObjectId
   subscriptionPlan   SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id])
 
-  status     SubscriptionStatus
-  expiryDate DateTime?
+  status         SubscriptionStatus
+  expiryDate     DateTime?
+  remainingCount Int?
 
   //** Payment subscription Invoice */
   invoiceId                  String?  @db.ObjectId
@@ -225,10 +241,15 @@ model PaymentSubscription {
   subscriptionValidityInDays Int?
   subscriptionAmount         Float?
 
+  //** Topup Payment back relations*/
+  TopupPayment    TopupPayment[] @relation(fields: [topupPaymentIds], references: [id])
+  topupPaymentIds String[]       @db.ObjectId
+
   createdById String   @db.ObjectId
   createdBy   Profile  @relation("paymentSubscriptions", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
 }
 
 model SubscriptionPlan {
@@ -273,6 +294,10 @@ model TopupPayment {
   //** topup plan relation */
   topupPlanId String    @db.ObjectId
   topupPlan   TopupPlan @relation(fields: [topupPlanId], references: [id])
+
+  //Subscription Payment Relation M-M
+  paymentSubscriptionIds String[]              @db.ObjectId
+  paymentSubscription    PaymentSubscription[] @relation(fields: [paymentSubscriptionIds], references: [id])
 
   //** topup bussiness invoice */
   businessId String   @db.ObjectId
@@ -335,6 +360,49 @@ model Coupon {
   updatedAt DateTime @updatedAt
 }
 
+model CommodityType {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+  isDeleted   Boolean  @default(false)
+
+  commodityTypeVarient CommodityTypeVarient[]
+
+  //** https://github.com/prisma/prisma/issues/12552 */
+  favoriteUsers FavoriteCommodityType[]
+}
+
+model FavoriteCommodityType {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String        @db.ObjectId
+  commodityType   CommodityType @relation(fields: [commodityTypeId], references: [id])
+  commodityTypeId String        @db.ObjectId
+  User            User          @relation(fields: [userId], references: [id])
+
+  @@unique([userId, commodityTypeId])
+}
+
+model CommodityTypeVarient {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  image       String?
+
+  //** Base CommodityType relation */
+  commodityTypeId String        @db.ObjectId
+  commodityType   CommodityType @relation(fields: [commodityTypeId], references: [id])
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  isActive  Boolean     @default(true)
+  isDeleted Boolean     @default(false)
+  Commodity Commodity[]
+}
+
 model Commodity {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
@@ -345,18 +413,87 @@ model Commodity {
   isActive    Boolean  @default(true)
   isDeleted   Boolean  @default(false)
 
-  //** https://github.com/prisma/prisma/issues/12552 */
-  favoriteUsers FavoriteCommodity[]
+  measurementUnit       MeasurementUnit
+  lotSize               Float
+  quantity              Float
+  location              Address
+  parameters            String[]
+  weight                Float
+  // weightUnit            String
+  qualityCertificateImg String?
+  commodityTypeImage    String
+  emdValue              Float
+  emdUnit               emdUnit
+
+  wareHouseId String       @db.ObjectId
+  wareHouse   BusinessUnit @relation(fields: [wareHouseId], references: [id])
+
+  sampleImages String[]
+
+  commodityTypeVarient   CommodityTypeVarient @relation(fields: [commodityTypeVarientId], references: [id])
+  commodityTypeVarientId String               @db.ObjectId
+
+  //** Commodity relation */
+  buyBids   BuyBid?
+  sellOffer SellOffer?
+
+
+  //** Created/Owner details relation */
+  businessId String?   @db.ObjectId
+  business   Business? @relation(fields: [businessId], references: [id])
+
+  profileId String?  @db.ObjectId
+  profile   Profile? @relation(fields: [profileId], references: [id])
+
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id])
+
 }
 
-model FavoriteCommodity {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String    @db.ObjectId
-  commodity   Commodity @relation(fields: [commodityId], references: [id])
-  commodityId String    @db.ObjectId
-  User        User      @relation(fields: [userId], references: [id])
+// create buy bid
+model BuyBid {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  @@unique([userId, commodityId])
+  commodityId String    @unique
+  commodity   Commodity @relation(fields: [commodityId], references: [id])
+
+
+  pricePerUnit     Float
+  billingAddress   Address
+  isPaymentSuccess Boolean
+  invoiceId        String
+  invoice          Invoice @relation(fields: [invoiceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+
+}
+
+//create sell offer
+model SellOffer {
+
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  commodityId String    @unique @db.ObjectId
+  commodity   Commodity @relation(fields: [commodityId], references: [id])
+
+
+  pricePerUnit     Float
+  accountInfo      String[]
+  billingAddress   Address
+  isPaymentSuccess Boolean
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+
+
 }
 
 type TransactionDetail {
@@ -521,4 +658,26 @@ enum CouponStatus {
   Expired
   Used
   Deleted
+}
+
+enum MeasurementUnit {
+  Kilogram
+  Gram
+  Ton
+  Piece
+  Box
+  Litter
+}
+
+enum InvoiceType {
+  // add new types here
+  BuyBid
+  SellOffer
+  Topup
+  Subscription
+}
+
+enum emdUnit {
+  Percentage
+  Fixed
 }
