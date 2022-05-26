@@ -44,19 +44,19 @@ model User {
   craetedBusinessUnits BusinessUnit[] @relation("businessUnits")
 
   //** Faverite commodities */
-  favoriteCommodityType FavoriteCommodityType[]
+  favoriteCommodityMaster FavoriteCommodityMaster[]
 
   //** All invoice created by this user */
-  invoices Invoice[] @relation("user_invoices")
-  // owned Commodity list
-  commodity Commodity[]
-
+  invoices  Invoice[]   @relation("user_invoices")
+  // owned TradeLead list
+  TradeLead TradeLead[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   isActive  Boolean @default(true)
   isDeleted Boolean @default(false)
+
 
   @@unique([email, mobile, aadhaar.number])
   @@unique([email, mobile])
@@ -100,14 +100,15 @@ model Profile {
   //** All invoice created by this profile */
   invoices            Invoice[]             @relation("profile_invoices")
 
-  // owned Commodity list
-  commodity Commodity[]
+  // owned TradeLead list
+  TradeLead TradeLead[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   isActive  Boolean @default(true)
   isDeleted Boolean @default(false)
+
 
 
   @@unique([userId, businessId, businessUnitId])
@@ -142,17 +143,18 @@ model Business {
   coupon              Coupon[]
   TopupPayment        TopupPayment[]
 
-  // owned Commodity list
-  commodity Commodity[]
+  // owned TradeLead list
+  TradeLead TradeLead[]
 
   createdById String   @db.ObjectId
   createdBy   User     @relation("business", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  isActive  Boolean     @default(false)
-  isDeleted Boolean     @default(false)
-  
+  isActive  Boolean @default(false)
+  isDeleted Boolean @default(false)
+
+
 }
 
 // branch/warehouse/sub entity  -- only valid for QC
@@ -182,7 +184,8 @@ model BusinessUnit {
 
   // All commudity records on the were house
   // relation ship
-  Commodity Commodity[]
+
+  TradeLead TradeLead[]
 }
 
 model Invoice {
@@ -202,8 +205,7 @@ model Invoice {
   //** invoice items */
   subscriptions PaymentSubscription[] @relation("invoices")
   topupPayments TopupPayment[]
-  BuyBid        BuyBid[]
-  SellOffer     SellOffer[]
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -212,12 +214,13 @@ model Invoice {
   isDeleted Boolean @default(false)
 
   //** Invoice relations */
-  createdByUserId String    @db.ObjectId
-  createdByUser   User      @relation("user_invoices", fields: [createdByUserId], references: [id])
-  Profile         Profile?  @relation("profile_invoices", fields: [profileId], references: [id])
-  profileId       String?   @db.ObjectId
-  Business        Business? @relation("business_invoices", fields: [businessId], references: [id])
-  businessId      String?   @db.ObjectId
+  createdByUserId String      @db.ObjectId
+  createdByUser   User        @relation("user_invoices", fields: [createdByUserId], references: [id])
+  Profile         Profile?    @relation("profile_invoices", fields: [profileId], references: [id])
+  profileId       String?     @db.ObjectId
+  Business        Business?   @relation("business_invoices", fields: [businessId], references: [id])
+  businessId      String?     @db.ObjectId
+  TradeLead       TradeLead[]
 }
 
 model PaymentSubscription {
@@ -360,7 +363,7 @@ model Coupon {
   updatedAt DateTime @updatedAt
 }
 
-model CommodityType {
+model CommodityMaster {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
@@ -370,58 +373,59 @@ model CommodityType {
   isActive    Boolean  @default(true)
   isDeleted   Boolean  @default(false)
 
-  commodityTypeVarient CommodityTypeVarient[]
+  commodityVarient CommodityVarient[]
 
   //** https://github.com/prisma/prisma/issues/12552 */
-  favoriteUsers FavoriteCommodityType[]
+  favoriteUsers FavoriteCommodityMaster[]
 }
 
-model FavoriteCommodityType {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String        @db.ObjectId
-  commodityType   CommodityType @relation(fields: [commodityTypeId], references: [id])
-  commodityTypeId String        @db.ObjectId
-  User            User          @relation(fields: [userId], references: [id])
+model FavoriteCommodityMaster {
+  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String          @db.ObjectId
+  commodityMaster   CommodityMaster @relation(fields: [commodityMasterId], references: [id])
+  commodityMasterId String          @db.ObjectId
+  User              User            @relation(fields: [userId], references: [id])
 
-  @@unique([userId, commodityTypeId])
+  @@unique([userId, commodityMasterId])
 }
 
-model CommodityTypeVarient {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+model CommodityVarient {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  image       String?
+  image       Doc?
+  qcParams    QcParam[]
 
-  //** Base CommodityType relation */
-  commodityTypeId String        @db.ObjectId
-  commodityType   CommodityType @relation(fields: [commodityTypeId], references: [id])
+  //** Base CommodityMaster relation */
+  commodityMasterId String          @db.ObjectId
+  commodityMaster   CommodityMaster @relation(fields: [commodityMasterId], references: [id])
+  TradeLeads        TradeLead[]
 
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  isActive  Boolean     @default(true)
-  isDeleted Boolean     @default(false)
-  Commodity Commodity[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
 }
 
-model Commodity {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
+model TradeLead {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   description String?
-  image       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isActive    Boolean  @default(true)
-  isDeleted   Boolean  @default(false)
+  images      Doc[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isActive    Boolean   @default(true)
+  isDeleted   Boolean   @default(false)
+  tradeType   TradeType
 
   measurementUnit       MeasurementUnit
   lotSize               Float
   quantity              Float
   location              Address
-  parameters            String[]
+  qcParams              QcParam[]
   weight                Float
   // weightUnit            String
   qualityCertificateImg String?
-  commodityTypeImage    String
+  commodityMasterImage  String
   emdValue              Float
   emdUnit               emdUnit
 
@@ -430,13 +434,16 @@ model Commodity {
 
   sampleImages String[]
 
-  commodityTypeVarient   CommodityTypeVarient @relation(fields: [commodityTypeVarientId], references: [id])
-  commodityTypeVarientId String               @db.ObjectId
+  commodityVarient   CommodityVarient @relation(fields: [commodityVarientId], references: [id])
+  commodityVarientId String           @db.ObjectId
 
-  //** Commodity relation */
-  buyBids   BuyBid?
-  sellOffer SellOffer?
+  pricePerUnit     Float
+  accountInfo      String[]
+  billingAddress   Address
+  isPaymentSuccess Boolean
 
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
 
   //** Created/Owner details relation */
   businessId String?   @db.ObjectId
@@ -450,50 +457,17 @@ model Commodity {
 
 }
 
-// create buy bid
-model BuyBid {
+model QcParameterMaster {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  commodityId String    @unique
-  commodity   Commodity @relation(fields: [commodityId], references: [id])
-
-
-  pricePerUnit     Float
-  billingAddress   Address
-  isPaymentSuccess Boolean
-  invoiceId        String
-  invoice          Invoice @relation(fields: [invoiceId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isActive  Boolean  @default(true)
-  isDeleted Boolean  @default(false)
 
 }
 
-//create sell offer
-model SellOffer {
-
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  commodityId String    @unique @db.ObjectId
-  commodity   Commodity @relation(fields: [commodityId], references: [id])
-
-
-  pricePerUnit     Float
-  accountInfo      String[]
-  billingAddress   Address
-  isPaymentSuccess Boolean
-
-  invoiceId String
-  invoice   Invoice @relation(fields: [invoiceId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isActive  Boolean  @default(true)
-  isDeleted Boolean  @default(false)
-
-
+type QcParam {
+  name           String
+  baseValue      Float
+  rejectionValue Float
+  qcParamType    QcParamType
+  mastedId       String?     @db.ObjectId
 }
 
 type TransactionDetail {
@@ -680,4 +654,14 @@ enum InvoiceType {
 enum emdUnit {
   Percentage
   Fixed
+}
+
+enum TradeType {
+  SellOffer
+  BuyBid
+}
+
+enum QcParamType {
+  custom
+  standard
 }
