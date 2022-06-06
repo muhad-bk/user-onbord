@@ -29,6 +29,9 @@ model User {
   lastName  String?
   image     String?
 
+  userType        UserType
+  defaultBusiness Business? @relation("defaultBusiness")
+
   //** user have multiple profile */
   profiles Profile[]
 
@@ -39,89 +42,33 @@ model User {
   address  Address[]
   contacts ContactNumber[]
 
-  emdWallet   EmdWallet?  @relation("emdWallet")
-
   //** created by user */
   createdBusiness      Business[]     @relation("business")
   craetedBusinessUnits BusinessUnit[] @relation("businessUnits")
 
-  //** Faverite commodities */
+  //** Favorite commodities */
   favoriteCommodityMaster FavoriteCommodityMaster[]
 
-  //** All invoice created by this user */
-  invoices  Invoice[]   @relation("user_invoices")
-  // owned TradeLead list
-  TradeLead TradeLead[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   isActive  Boolean @default(true)
   isDeleted Boolean @default(false)
-
 
   @@unique([email, mobile, aadhaar.number])
   @@unique([email, mobile])
 }
 
-model Profile {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  //* @TODO we need to specify the roles with the business types and remove the Business Type enum */
-  profileType BusinessType
-  status      UserStatus // owner verification pending, invited, active, otp verification pending, blocked
-
-  //* A profile can have a role */
-  //**  @TODO profile can have multiple roles */
-  role Role
-
-
-  // user profile relatioship 1-M
-  userId String @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id])
-
-  //** invitations mangement */
-  invitatedById      String?          @db.ObjectId
-  invitatedBy        Profile?         @relation("invitations", fields: [invitatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  invitationStatus   InvitationStatus
-  invitationHashCode String?
-  invitationDate     DateTime?
-  invitationExpiry   DateTime?
-
-  createdInvitations Profile[] @relation("invitations")
-
-
-  // profile business relatioship M-1
-  businessId String?   @db.ObjectId
-  business   Business? @relation(fields: [businessId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  // profile businessUnit relatioship M-1
-  businessUnitId String?       @db.ObjectId
-  businessUnits  BusinessUnit? @relation(fields: [businessUnitId], references: [id])
-
-  paymentSubscription PaymentSubscription[] @relation("paymentSubscriptions")
-  //** All invoice created by this profile */
-  invoices            Invoice[]             @relation("profile_invoices")
-
-  // owned TradeLead list
-  TradeLead TradeLead[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  isActive  Boolean @default(true)
-  isDeleted Boolean @default(false)
-
-
-
-  @@unique([userId, businessId, businessUnitId])
-}
-
 model Business {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  GSTIN               String
-  leagalName          String         @unique
-  displayName         String         @unique
+  defaultBusinessUserId String?        @db.ObjectId @unique
+  defaultBussinessUser  User?          @relation("defaultBusiness", fields: [defaultBusinessUserId], references: [id])
+  type                  ModeOfBusiness // default bussiness
+
+  GSTIN               String?
+  displayName         String?        @unique  // copy the user full name 
   description         String?
   logo                String?
   dateOfIncorporation DateTime?
@@ -131,7 +78,6 @@ model Business {
   status              BusinessStatus @default(Active)
   // preferred to use calculatiom methord instead of this field
   remainingCount      Int?           @default(0)
-
 
   //** dummy relations for prisma */
   //** business have multiple business units in QC  */
@@ -156,9 +102,51 @@ model Business {
   isActive  Boolean @default(false)
   isDeleted Boolean @default(false)
 
+  emdWalletCurrentAmount Float
+  transactions           TransactionDetail[]
+  tradeLeads             TradeLeadEmdWallets[]
+}
 
-  Emd       TradeLeadEmdWallets[]
-  EmdWallet EmdWallet[]
+model Profile {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  //* @TODO we need to specify the roles with the business types and remove the Business Type enum */
+  profileType BusinessType
+  status      UserStatus // owner verification pending, invited, active, otp verification pending, blocked
+
+  //* A profile can have a role */
+  //**  @TODO profile can have multiple roles */
+  role Role
+
+  // user profile relatioship 1-M
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  //** invitations mangement */
+  invitatedById      String?          @db.ObjectId
+  invitatedBy        Profile?         @relation("invitations", fields: [invitatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invitationStatus   InvitationStatus
+  invitationHashCode String?
+  invitationDate     DateTime?
+  invitationExpiry   DateTime?
+
+  createdInvitations Profile[] @relation("invitations")
+
+
+  // profile business relatioship M-1
+  businessId String?   @db.ObjectId
+  business   Business? @relation(fields: [businessId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  // profile businessUnit relatioship M-1
+  businessUnitId String?       @db.ObjectId
+  businessUnits  BusinessUnit? @relation(fields: [businessUnitId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isActive  Boolean @default(true)
+  isDeleted Boolean @default(false)
+
+  @@unique([userId, businessId, businessUnitId])
 }
 
 // branch/warehouse/sub entity  -- only valid for QC
@@ -186,9 +174,7 @@ model BusinessUnit {
   isActive  Boolean @default(true)
   isDeleted Boolean @default(false)
 
-  // All commudity records on the were house
-  // relation ship
-
+  // wherehouse storage location relation ship
   TradeLead TradeLead[]
 }
 
@@ -217,14 +203,11 @@ model Invoice {
   isActive  Boolean @default(true)
   isDeleted Boolean @default(false)
 
+  TradeLead TradeLead[]
+
   //** Invoice relations */
-  createdByUserId String      @db.ObjectId
-  createdByUser   User        @relation("user_invoices", fields: [createdByUserId], references: [id])
-  Profile         Profile?    @relation("profile_invoices", fields: [profileId], references: [id])
-  profileId       String?     @db.ObjectId
-  Business        Business?   @relation("business_invoices", fields: [businessId], references: [id])
-  businessId      String?     @db.ObjectId
-  TradeLead       TradeLead[]
+  Business   Business? @relation("business_invoices", fields: [businessId], references: [id])
+  businessId String?   @db.ObjectId
 }
 
 model PaymentSubscription {
@@ -252,10 +235,8 @@ model PaymentSubscription {
   TopupPayment    TopupPayment[] @relation(fields: [topupPaymentIds], references: [id])
   topupPaymentIds String[]       @db.ObjectId
 
-  createdById String   @db.ObjectId
-  createdBy   Profile  @relation("paymentSubscriptions", fields: [createdById], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
 }
 
@@ -291,7 +272,6 @@ model TopupPayment {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   amount Float
-
   paymentStatus PaymentStatus
 
   //** topup Payment  Invoice */
@@ -455,14 +435,8 @@ model TradeLead {
   invoice   Invoice @relation(fields: [invoiceId], references: [id])
 
   //** Created/Owner details relation */
-  businessId String?   @db.ObjectId
-  business   Business? @relation(fields: [businessId], references: [id])
-
-  profileId String?  @db.ObjectId
-  profile   Profile? @relation(fields: [profileId], references: [id])
-
-  userId String? @db.ObjectId
-  user   User?   @relation(fields: [userId], references: [id])
+  businessId String   @db.ObjectId 
+  business   Business @relation(fields: [businessId], references: [id])
 
   fromRequest TradeRequest[] @relation("from")
   toRequest   TradeRequest[] @relation("to")
@@ -472,37 +446,16 @@ model TradeLead {
 model TradeLeadEmdWallets {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  emdValue      Float
-  transaction   TransactionDetail? @relation("emdTransactionDetail")
+  emdValue    Float
+  transaction TransactionDetail? @relation("emdTransactionDetail")
 
   tradeLeadId String    @db.ObjectId
   tradeLead   TradeLead @relation(fields: [tradeLeadId], references: [id])
 
-  emdId      String    @db.ObjectId
-  emd        EmdWallet @relation(fields: [emdId], references: [id])
-  Business   Business? @relation(fields: [businessId], references: [id])
-  businessId String?   @db.ObjectId
-}
+  bssinessId String   @db.ObjectId
+  emd        Business @relation(fields: [bssinessId], references: [id])
 
-model EmdWallet {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  emdWalletCurrentAmount Float
-  transactions           TransactionDetail[]
-  tradeLeads             TradeLeadEmdWallets[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isActive  Boolean  @default(true)
-  isDeleted Boolean  @default(false)
-
-  userId String? @db.ObjectId
-  user User? @relation("emdWallet", fields: [userId], references: [id])
-
-  businessId String?   @db.ObjectId
-  business   Business? @relation(fields: [businessId], references: [id])
-
-  
+  @@unique([tradeLeadId, bssinessId])
 }
 
 model TradeRequest {
@@ -526,8 +479,7 @@ model TradeRequest {
   isDeleted Boolean  @default(false)
 
   // for reference only from the UI prespective
-  location Address
-
+  location     Address
   TradeExecton TradeExecton? @relation("TradeExecton")
 }
 
@@ -580,10 +532,10 @@ model TransactionDetail {
   Invoice   Invoice? @relation(fields: [invoiceId], references: [id])
   invoiceId String?  @db.ObjectId
 
-  Emd         TradeLeadEmdWallets? @relation("emdTransactionDetail",fields: [emdId], references: [id])
-  emdId       String?              @unique @db.ObjectId
-  EmdWallet   EmdWallet?           @relation(fields: [emdWalletId], references: [id])
-  emdWalletId String?              @db.ObjectId
+  Emd        TradeLeadEmdWallets? @relation("emdTransactionDetail", fields: [emdBissinessId], references: [id])
+  emdBissinessId      String?              @unique @db.ObjectId
+  Business   Business?            @relation(fields: [businessId], references: [id])
+  businessId String?              @db.ObjectId
 }
 
 type ContactNumber {
@@ -796,4 +748,16 @@ enum TradeExectonStatus {
 enum TransactionObjective {
   Payment
   Refund
+}
+
+enum UserType {
+  NormalUser
+  BusinessUser
+  BussinessOwner
+}
+
+// Its defines the the default bussiness (personal user ) and custom user created bussiness
+enum ModeOfBusiness {
+  personal
+  business
 }
