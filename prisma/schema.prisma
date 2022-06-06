@@ -18,6 +18,80 @@ generator typegraphql {
   simpleResolvers    = true
 }
 
+model BussinessListing {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+
+  listingCategyId String        @db.ObjectId
+  ListingCategy   ListingCategy @relation(fields: [listingCategyId], references: [id])
+
+  Attributes AttributeWithValues[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+}
+
+model BusinessQuotation {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  Attributes AttributeWithValues[]
+
+
+  // Quotation user/ bussiness info
+  businessId String   @db.ObjectId
+  Business   Business @relation(fields: [businessId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+}
+
+model ListingCategy {
+  id                      String              @id @default(auto()) @map("_id") @db.ObjectId
+  name                    String              @unique
+  description             String
+  ListingFormAttributes   CategoryAttribute[]
+  QuotationFprmAttributes CategoryAttribute[]
+
+  BussinessListings BussinessListing[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  isActive          Boolean            @default(true)
+  isDeleted         Boolean            @default(false)
+
+}
+
+type AttributeWithValues {
+  name  String
+  type  AttributeType
+  value String
+}
+
+type CategoryAttribute {
+  orderByNo Int // optional
+  label     String
+  type      AttributeType
+  options   String[]
+}
+
+enum AttributeType {
+  text
+  textArea
+  number
+  date
+  checkbox
+  radio
+  dropdown
+  select
+  multiSelect
+  password
+  file
+  image
+}
+
 model User {
   id               String  @id @default(auto()) @map("_id") @db.ObjectId
   email            String? @unique
@@ -29,7 +103,7 @@ model User {
   lastName  String?
   image     String?
 
-  userType        UserType
+  userType UserType
 
   //** user have multiple profile */
   profiles Profile[]
@@ -62,7 +136,7 @@ model Business {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   GSTIN               String?
-  displayName         String?        @unique  // copy the user full name 
+  displayName         String?        @unique // copy the user full name 
   description         String?
   logo                String?
   dateOfIncorporation DateTime?
@@ -104,6 +178,7 @@ model Business {
   transactions           TransactionDetail[]
   tradeLeads             TradeLeadEmdWallets[]
 
+  BusinessQuotation BusinessQuotation[]
   @@unique([createdById, defaultBusiness(true)])
 }
 
@@ -270,7 +345,7 @@ model SubscriptionPlan {
 model TopupPayment {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  amount Float
+  amount        Float
   paymentStatus PaymentStatus
 
   //** topup Payment  Invoice */
@@ -434,7 +509,7 @@ model TradeLead {
   invoice   Invoice @relation(fields: [invoiceId], references: [id])
 
   //** Created/Owner details relation */
-  businessId String   @db.ObjectId 
+  businessId String   @db.ObjectId
   business   Business @relation(fields: [businessId], references: [id])
 
   fromRequest TradeRequest[] @relation("from")
@@ -531,10 +606,10 @@ model TransactionDetail {
   Invoice   Invoice? @relation(fields: [invoiceId], references: [id])
   invoiceId String?  @db.ObjectId
 
-  Emd        TradeLeadEmdWallets? @relation("emdTransactionDetail", fields: [emdBissinessId], references: [id])
-  emdBissinessId      String?              @unique @db.ObjectId
-  Business   Business?            @relation(fields: [businessId], references: [id])
-  businessId String?              @db.ObjectId
+  Emd            TradeLeadEmdWallets? @relation("emdTransactionDetail", fields: [emdBissinessId], references: [id])
+  emdBissinessId String?              @unique @db.ObjectId
+  Business       Business?            @relation(fields: [businessId], references: [id])
+  businessId     String?              @db.ObjectId
 }
 
 type ContactNumber {
