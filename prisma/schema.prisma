@@ -20,7 +20,7 @@ generator typegraphql {
 
 model User {
   id               String  @id @default(auto()) @map("_id") @db.ObjectId
-  email            String?
+  email            String? @unique
   isEmailVerified  Boolean @default(false)
   mobile           String  @unique
   isMobileVerified Boolean @default(false)
@@ -30,7 +30,6 @@ model User {
   image     String?
 
   userType        UserType
-  defaultBusiness Business? @relation("defaultBusiness")
 
   //** user have multiple profile */
   profiles Profile[]
@@ -49,7 +48,6 @@ model User {
   //** Favorite commodities */
   favoriteCommodityMaster FavoriteCommodityMaster[]
 
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -62,10 +60,6 @@ model User {
 
 model Business {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  defaultBusinessUserId String?        @db.ObjectId @unique
-  defaultBussinessUser  User?          @relation("defaultBusiness", fields: [defaultBusinessUserId], references: [id])
-  type                  ModeOfBusiness // default bussiness
 
   GSTIN               String?
   displayName         String?        @unique  // copy the user full name 
@@ -94,6 +88,10 @@ model Business {
   // owned TradeLead list
   TradeLead TradeLead[]
 
+  // when the personal business automatically created when normal user register its true
+  defaultBusiness Boolean @default(false)
+
+  // owned business
   createdById String   @db.ObjectId
   createdBy   User     @relation("business", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
@@ -105,6 +103,8 @@ model Business {
   emdWalletCurrentAmount Float
   transactions           TransactionDetail[]
   tradeLeads             TradeLeadEmdWallets[]
+
+  @@unique([createdById, defaultBusiness(true)])
 }
 
 model Profile {
@@ -195,7 +195,6 @@ model Invoice {
   //** invoice items */
   subscriptions PaymentSubscription[] @relation("invoices")
   topupPayments TopupPayment[]
-
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
