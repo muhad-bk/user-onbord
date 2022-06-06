@@ -39,6 +39,8 @@ model User {
   address  Address[]
   contacts ContactNumber[]
 
+  emdWallet   EmdWallet?  @relation("emdWallet")
+
   //** created by user */
   createdBusiness      Business[]     @relation("business")
   craetedBusinessUnits BusinessUnit[] @relation("businessUnits")
@@ -155,6 +157,8 @@ model Business {
   isDeleted Boolean @default(false)
 
 
+  Emd       TradeLeadEmdWallets[]
+  EmdWallet EmdWallet[]
 }
 
 // branch/warehouse/sub entity  -- only valid for QC
@@ -396,6 +400,7 @@ model CommodityVarient {
   image       Doc?
   qcParams    QcParam[]
 
+
   //** Base CommodityMaster relation */
   commodityMasterId String          @db.ObjectId
   commodityMaster   CommodityMaster @relation(fields: [commodityMasterId], references: [id])
@@ -428,6 +433,8 @@ model TradeLead {
   commodityMasterImage  String
   emdValue              Float
   emdUnit               emdUnit
+  TradeLeadEmds         TradeLeadEmdWallets[]
+
 
   wareHouseId String       @db.ObjectId
   wareHouse   BusinessUnit @relation(fields: [wareHouseId], references: [id])
@@ -436,6 +443,8 @@ model TradeLead {
 
   commodityVarient   CommodityVarient @relation(fields: [commodityVarientId], references: [id])
   commodityVarientId String           @db.ObjectId
+
+  shipmentPaln ShipmentPlan?
 
   pricePerUnit     Float
   accountInfo      String[]
@@ -455,6 +464,93 @@ model TradeLead {
   userId String? @db.ObjectId
   user   User?   @relation(fields: [userId], references: [id])
 
+  fromRequest TradeRequest[] @relation("from")
+  toRequest   TradeRequest[] @relation("to")
+
+}
+
+model TradeLeadEmdWallets {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  emdValue      Float
+  transaction   TransactionDetail? @relation("emdTransactionDetail")
+
+  tradeLeadId String    @db.ObjectId
+  tradeLead   TradeLead @relation(fields: [tradeLeadId], references: [id])
+
+  emdId      String    @db.ObjectId
+  emd        EmdWallet @relation(fields: [emdId], references: [id])
+  Business   Business? @relation(fields: [businessId], references: [id])
+  businessId String?   @db.ObjectId
+}
+
+model EmdWallet {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  emdWalletCurrentAmount Float
+  transactions           TransactionDetail[]
+  tradeLeads             TradeLeadEmdWallets[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+
+  userId String? @db.ObjectId
+  user User? @relation("emdWallet", fields: [userId], references: [id])
+
+  businessId String?   @db.ObjectId
+  business   Business? @relation(fields: [businessId], references: [id])
+
+  
+}
+
+model TradeRequest {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  fromTradeLeadId String    @db.ObjectId
+  fromTreadLead   TradeLead @relation("from", fields: [fromTradeLeadId], references: [id])
+  toTradeLeadId   String    @db.ObjectId
+  toTradeLead     TradeLead @relation("to", fields: [toTradeLeadId], references: [id])
+
+  direction TradeDirection
+  status    TradeRequestStatus
+
+  measurementunit MeasurementUnit
+  lotSize         Float?
+  quantity        Int
+  priceperunit    Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+
+  // for reference only from the UI prespective
+  location Address
+
+  TradeExecton TradeExecton? @relation("TradeExecton")
+}
+
+// TradeExecton is not complited
+model TradeExecton {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  tradeRequestId String       @unique @db.ObjectId
+  tradeRequest   TradeRequest @relation("TradeExecton", fields: [tradeRequestId], references: [id])
+
+  docs            Doc[]
+  status          TradeExectonStatus
+  shippingAddress Address
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+
+  // for reference only from the UI prespective
+  location Address
+
 }
 
 model QcParameterMaster {
@@ -470,14 +566,24 @@ type QcParam {
   mastedId       String?     @db.ObjectId
 }
 
-type TransactionDetail {
-  transactionId     String
-  transactionRefId  String
-  transactionStatus TransactionStatus
-  transactionAmount Float
-  transactionDate   DateTime
-  transactionType   TransactionType
-  transactionMode   TransactionMode
+model TransactionDetail {
+
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  transactionStatus    TransactionStatus
+  transactionAmount    Float
+  transactionDate      DateTime
+  transactionType      TransactionType
+  transactionMode      TransactionMode
+  transactionObjective TransactionObjective
+
+  Invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+  invoiceId String?  @db.ObjectId
+
+  Emd         TradeLeadEmdWallets? @relation("emdTransactionDetail",fields: [emdId], references: [id])
+  emdId       String?              @unique @db.ObjectId
+  EmdWallet   EmdWallet?           @relation(fields: [emdWalletId], references: [id])
+  emdWalletId String?              @db.ObjectId
 }
 
 type ContactNumber {
@@ -522,6 +628,11 @@ type SocialMedia {
   linkedin   String?
   googlePlus String?
   youtube    String?
+}
+
+type ShipmentPlan {
+  days Int
+  lots Int
 }
 
 enum InvitationStatus {
@@ -611,8 +722,8 @@ enum TransactionMode {
 }
 
 enum TransactionType {
-  Payment
-  Refund
+  CREDIT
+  DEBIT
 }
 
 enum TransactionStatus {
@@ -664,4 +775,25 @@ enum TradeType {
 enum QcParamType {
   custom
   standard
+}
+
+enum TradeRequestStatus {
+  Pending
+  Accepted
+  Rejected
+}
+
+enum TradeDirection {
+  BuyBidToSellOffer
+  SellOfferToBuyBid
+}
+
+enum TradeExectonStatus {
+  Deliverd
+  OnGoing
+}
+
+enum TransactionObjective {
+  Payment
+  Refund
 }
