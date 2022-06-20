@@ -25,12 +25,30 @@ model BussinessListing {
   listingCategyId String        @db.ObjectId
   ListingCategy   ListingCategy @relation(fields: [listingCategyId], references: [id])
 
-  Attributes AttributeWithValues[]
+  Attributes        AttributeWithValues[]
+  BusinessQuotation BusinessQuotation[]
+  RFQ               RFQ[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isActive  Boolean  @default(true)
   isDeleted Boolean  @default(false)
+
+}
+
+model RFQ {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  Attributes AttributeWithValues[]
+  // Quotation user/ bussiness info
+  businessId String                @db.ObjectId
+
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  isActive           Boolean           @default(true)
+  isDeleted          Boolean           @default(false)
+  BussinessListing   BussinessListing? @relation(fields: [bussinessListingId], references: [id])
+  bussinessListingId String?           @db.ObjectId
 }
 
 model BusinessQuotation {
@@ -38,23 +56,23 @@ model BusinessQuotation {
 
   Attributes AttributeWithValues[]
 
-
   // Quotation user/ bussiness info
-  businessId String   @db.ObjectId
-  Business   Business @relation(fields: [businessId], references: [id])
+  businessId String @db.ObjectId
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isActive  Boolean  @default(true)
-  isDeleted Boolean  @default(false)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  isActive           Boolean           @default(true)
+  isDeleted          Boolean           @default(false)
+  BussinessListing   BussinessListing? @relation(fields: [bussinessListingId], references: [id])
+  bussinessListingId String?           @db.ObjectId
 }
 
 model ListingCategy {
-  id                      String              @id @default(auto()) @map("_id") @db.ObjectId
-  name                    String              @unique
+  id                      String          @id @default(auto()) @map("_id") @db.ObjectId
+  name                    String          @unique
   description             String
-  ListingFormAttributes   CategoryAttribute[]
-  QuotationFprmAttributes CategoryAttribute[]
+  ListingFormAttributes   AttributeItem[]
+  QuotationFprmAttributes AttributeItem[]
 
   BussinessListings BussinessListing[]
   createdAt         DateTime           @default(now())
@@ -70,11 +88,12 @@ type AttributeWithValues {
   value String
 }
 
-type CategoryAttribute {
-  orderByNo Int // optional
-  label     String
-  type      AttributeType
-  options   String[]
+type AttributeItem {
+  orderByNo        Int // optional
+  label            String
+  type             AttributeType
+  options          String[]
+  attributeContols AttributeContols[]
 }
 
 enum AttributeType {
@@ -90,6 +109,17 @@ enum AttributeType {
   password
   file
   image
+}
+
+enum AttributeContols {
+  min
+  max
+  minLength
+  maxLength
+  isEmail
+  isNotEmpty
+  isPhone
+  isNumber
 }
 
 model User {
@@ -178,7 +208,6 @@ model Business {
   transactions           TransactionDetail[]
   tradeLeads             TradeLeadEmdWallets[]
 
-  BusinessQuotation BusinessQuotation[]
   @@unique([createdById, defaultBusiness(true)])
 }
 
