@@ -22,8 +22,8 @@ model BussinessListing {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
 
-  listingCategyId String        @db.ObjectId
-  ListingCategy   ListingCategy @relation(fields: [listingCategyId], references: [id])
+  listingCatalogueId String        @db.ObjectId
+  ListingCatalogue   ListingCatalogue @relation(fields: [listingCatalogueId], references: [id])
 
   Attributes        AttributeWithValues[]
   BusinessQuotation BusinessQuotation[]
@@ -67,7 +67,7 @@ model BusinessQuotation {
   bussinessListingId String?           @db.ObjectId
 }
 
-model ListingCategy {
+model ListingCatalogue {
   id                      String          @id @default(auto()) @map("_id") @db.ObjectId
   name                    String          @unique
   nameTransilations       Translation[]
