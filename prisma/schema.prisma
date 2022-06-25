@@ -22,7 +22,7 @@ model BussinessListing {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
 
-  listingCatalogueId String        @db.ObjectId
+  listingCatalogueId String           @db.ObjectId
   ListingCatalogue   ListingCatalogue @relation(fields: [listingCatalogueId], references: [id])
 
   Attributes        AttributeWithValues[]
@@ -68,40 +68,42 @@ model BusinessQuotation {
 }
 
 model ListingCatalogue {
-  id                      String          @id @default(auto()) @map("_id") @db.ObjectId
-  name                    String          @unique
-  nameTransilations       Translation[]
-  description             String
-  descriptionTranslations Translation[] 
-  ListingFormAttributes   AttributeItem[]
-  QuotationFprmAttributes AttributeItem[]
-
-  BussinessListings BussinessListing[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  isActive          Boolean            @default(true)
-  isDeleted         Boolean            @default(false)
+  id                              String             @id @default(auto()) @map("_id") @db.ObjectId
+  name                            String             @unique
+  nameTransilations               Translation[]
+  description                     String
+  descriptionTranslations         Translation[]
+  ListingFormAttributes           AttributeItem[]
+  BusinessQuotationFormAttributes AttributeItem[]
+  RFQFormAttributes               AttributeItem[]
+  
+  BussinessListings               BussinessListing[]
+  createdAt                       DateTime           @default(now())
+  updatedAt                       DateTime           @updatedAt
+  isActive                        Boolean            @default(true)
+  isDeleted                       Boolean            @default(false)
 
 }
 
 type AttributeWithValues {
   name  String
   type  AttributeType
-  transilations Translation[]
   value String
 }
 
 type Translation {
-  value  String
-  language  Language
+  value    String
+  language Language
 }
 
 type AttributeItem {
-  orderByNo        Int // optional
-  label            String
-  type             AttributeType
-  options          String[]
-  attributeContols AttributeContols[]
+  orderByNo          Int // optional
+  label              String
+  labelTransilations Translation[]
+  type               AttributeType
+  options            String[]
+  optionsTransilations Translation[]  // we need to use filter to get the right language
+  attributeContols   AttributeContols[]
 }
 
 enum AttributeType {
