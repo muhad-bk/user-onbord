@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["extendedIndexes", "fullTextIndex"]
+  previewFeatures = ["fullTextIndex"]
 }
 
 datasource db {
@@ -33,7 +33,6 @@ model BussinessListing {
   updatedAt DateTime @updatedAt
   isActive  Boolean  @default(true)
   isDeleted Boolean  @default(false)
-
 }
 
 model RFQ {
@@ -68,21 +67,20 @@ model BusinessQuotation {
 }
 
 model ListingCatalogue {
-  id                              String             @id @default(auto()) @map("_id") @db.ObjectId
-  name                            String             @unique
+  id                              String          @id @default(auto()) @map("_id") @db.ObjectId
+  name                            String          @unique
   nameTransilations               Translation[]
   description                     String
   descriptionTranslations         Translation[]
   ListingFormAttributes           AttributeItem[]
   BusinessQuotationFormAttributes AttributeItem[]
   RFQFormAttributes               AttributeItem[]
-  
-  BussinessListings               BussinessListing[]
-  createdAt                       DateTime           @default(now())
-  updatedAt                       DateTime           @updatedAt
-  isActive                        Boolean            @default(true)
-  isDeleted                       Boolean            @default(false)
 
+  BussinessListings BussinessListing[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  isActive          Boolean            @default(true)
+  isDeleted         Boolean            @default(false)
 }
 
 type AttributeWithValues {
@@ -97,13 +95,13 @@ type Translation {
 }
 
 type AttributeItem {
-  orderByNo          Int // optional
-  label              String
-  labelTransilations Translation[]
-  type               AttributeType
-  options            String[]
-  optionsTransilations Translation[]  // we need to use filter to get the right language
-  attributeContols   AttributeContols[]
+  orderByNo            Int // optional
+  label                String
+  labelTransilations   Translation[]
+  type                 AttributeType
+  options              String[]
+  optionsTransilations Translation[] // we need to use filter to get the right language
+  attributeContols     AttributeContols[]
 }
 
 enum AttributeType {
@@ -165,8 +163,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  isActive  Boolean @default(true)
-  isDeleted Boolean @default(false)
+  isActive          Boolean             @default(true)
+  isDeleted         Boolean             @default(false)
+  TransactionDetail TransactionDetail[]
 
   @@unique([email, mobile, aadhaar.number])
   @@unique([email, mobile])
@@ -245,7 +244,6 @@ model Profile {
 
   createdInvitations Profile[] @relation("invitations")
 
-
   // profile business relatioship M-1
   businessId String?   @db.ObjectId
   business   Business? @relation(fields: [businessId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -319,8 +317,10 @@ model Invoice {
   TradeLead TradeLead[]
 
   //** Invoice relations */
-  Business   Business? @relation("business_invoices", fields: [businessId], references: [id])
-  businessId String?   @db.ObjectId
+  Business         Business?       @relation("business_invoices", fields: [businessId], references: [id])
+  businessId       String?         @db.ObjectId
+  TradeExecution   TradeExecution? @relation(fields: [tradeExecutionId], references: [id])
+  tradeExecutionId String?         @db.ObjectId
 }
 
 model PaymentSubscription {
@@ -350,7 +350,6 @@ model PaymentSubscription {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
 model SubscriptionPlan {
@@ -493,7 +492,6 @@ model CommodityVarient {
   image       Doc?
   qcParams    QcParam[]
 
-
   //** Base CommodityMaster relation */
   commodityMasterId String          @db.ObjectId
   commodityMaster   CommodityMaster @relation(fields: [commodityMasterId], references: [id])
@@ -528,7 +526,6 @@ model TradeLead {
   emdUnit               emdUnit
   TradeLeadEmds         TradeLeadEmdWallets[]
 
-
   wareHouseId String       @db.ObjectId
   wareHouse   BusinessUnit @relation(fields: [wareHouseId], references: [id])
 
@@ -536,8 +533,6 @@ model TradeLead {
 
   commodityVarient   CommodityVarient @relation(fields: [commodityVarientId], references: [id])
   commodityVarientId String           @db.ObjectId
-
-  shipmentPaln ShipmentPlan?
 
   pricePerUnit     Float
   accountInfo      String[]
@@ -551,9 +546,9 @@ model TradeLead {
   businessId String   @db.ObjectId
   business   Business @relation(fields: [businessId], references: [id])
 
-  fromRequest TradeRequest[] @relation("from")
-  toRequest   TradeRequest[] @relation("to")
-
+  fromRequest       TradeRequest[]      @relation("from")
+  toRequest         TradeRequest[]      @relation("to")
+  TransactionDetail TransactionDetail[]
 }
 
 model TradeLeadEmdWallets {
@@ -585,6 +580,7 @@ model TradeRequest {
   lotSize         Float?
   quantity        Int
   priceperunit    Float
+  shipmentPalns   ShipmentPlan[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -592,35 +588,64 @@ model TradeRequest {
   isDeleted Boolean  @default(false)
 
   // for reference only from the UI prespective
-  location     Address
-  TradeExecton TradeExecton? @relation("TradeExecton")
+  location       Address
+  TradeExecution TradeExecution? @relation("TradeExecution")
 }
 
-// TradeExecton is not complited
-model TradeExecton {
+// TradeExecution is not complited
+model TradeExecution {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   tradeRequestId String       @unique @db.ObjectId
-  tradeRequest   TradeRequest @relation("TradeExecton", fields: [tradeRequestId], references: [id])
+  tradeRequest   TradeRequest @relation("TradeExecution", fields: [tradeRequestId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  docs            Doc[]
-  status          TradeExectonStatus
-  shippingAddress Address
+  docs              Doc[]
+  status            TradeExecutionStatus
+  shippingAddress   Address
+  Shipments         Shipment[]           @relation("Shipment")
+  commodityName     String
+  VariantName       String
+  SellerName        String
+  BuyerName         String
+  CommodityLocation Address
+  DeliveryLocation  Address
+  EMDLocked         Float
+  PricePerUnit      Float
 
+  PaymentExpectedDate DateTime
+  TradeStatus         String
+  CommodityPrice      Float
+  paymentStatus       String
+  TradeQuantity       Float
+  paymentInvoices     Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+}
+
+model Shipment {
+  id                   String         @id @default(auto()) @map("_id") @db.ObjectId
+  shipmentSortOrder    Int
+  shipmentPlan         ShipmentPlan
+  shipmentStatus       ShipmentStatus
+  expectedDeliveryDate DateTime
+  quantity             Int
+  eWayBill             Doc[]
+  invoice              Doc[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isActive  Boolean  @default(true)
   isDeleted Boolean  @default(false)
 
-  // for reference only from the UI prespective
-  location Address
-
+  TradeExecution   TradeExecution? @relation("Shipment", fields: [tradeExecutionId], references: [id])
+  tradeExecutionId String?         @db.ObjectId
 }
 
 model QcParameterMaster {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-
 }
 
 type QcParam {
@@ -632,23 +657,41 @@ type QcParam {
 }
 
 model TransactionDetail {
-
+  // 
   id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  discription String?
+
+  from TransactionFromAndTo
+  to   TransactionFromAndTo
 
   transactionStatus    TransactionStatus
   transactionAmount    Float
   transactionDate      DateTime
-  transactionType      TransactionType
+  transactionType      TransactionType // credit/debit for businessId 
   transactionMode      TransactionMode
   transactionObjective TransactionObjective
 
   Invoice   Invoice? @relation(fields: [invoiceId], references: [id])
   invoiceId String?  @db.ObjectId
 
+  tradeLeadId String?    @db.ObjectId
+  tradeLead   TradeLead? @relation(fields: [tradeLeadId], references: [id])
+
   Emd            TradeLeadEmdWallets? @relation("emdTransactionDetail", fields: [emdBissinessId], references: [id])
   emdBissinessId String?              @unique @db.ObjectId
   Business       Business?            @relation(fields: [businessId], references: [id])
   businessId     String?              @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactionDebitDetailId String?            @unique @db.ObjectId
+  TransatctionDebitDetails TransactionDetail? @relation("TransactionDebitDetails", fields: [transactionDebitDetailId], references: [id], onDelete: NoAction, onUpdate: NoAction) // for creid transaction
+  TransactionDetail        TransactionDetail? @relation("TransactionDebitDetails") // for debit transaction  
+
+  transactionDoneById   String @db.ObjectId
+  transactionDoneByUser User   @relation(fields: [transactionDoneById], references: [id])
 }
 
 type ContactNumber {
@@ -853,7 +896,7 @@ enum TradeDirection {
   SellOfferToBuyBid
 }
 
-enum TradeExectonStatus {
+enum TradeExecutionStatus {
   Deliverd
   OnGoing
 }
@@ -890,4 +933,20 @@ enum Language {
   Bengali
   Kashmiri
   Nepali
+}
+
+enum ShipmentStatus {
+  Pending
+  InTransit
+  Delivered
+  Cancelled
+  Rejected
+}
+
+enum TransactionFromAndTo {
+  TradeLeadWallet
+  BusinessBankWallet
+  BusinessSrLeinWallet
+  UserBankTransaction
+  UserSrLeinTransaction
 }
