@@ -38,7 +38,8 @@ model BussinessListing {
 model RFQ {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  Attributes AttributeWithValues[]
+  AttributesValues AttributeWithValues[]
+  Attributes          AttributeItem[]
   // Quotation user/ bussiness info
   businessId String                @db.ObjectId
 
@@ -53,7 +54,8 @@ model RFQ {
 model BusinessQuotation {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  Attributes AttributeWithValues[]
+  AttributesValues AttributeWithValues[]
+  Attributes          AttributeItem[]
 
   // Quotation user/ bussiness info
   businessId String @db.ObjectId
@@ -64,6 +66,18 @@ model BusinessQuotation {
   isDeleted          Boolean           @default(false)
   BussinessListing   BussinessListing? @relation(fields: [bussinessListingId], references: [id])
   bussinessListingId String?           @db.ObjectId
+
+  Negotiations Negotiations[]
+}
+
+model Negotiations {
+  id                  String                @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt           DateTime              @default(now())
+  isFinal             Boolean               @default(false)
+  Attributes          AttributeItem[]
+  AttributesValues    AttributeWithValues[]
+  BusinessQuotation   BusinessQuotation?    @relation(fields: [businessQuotationId], references: [id])
+  businessQuotationId String?               @db.ObjectId
 }
 
 model ListingCatalogue {
@@ -75,6 +89,7 @@ model ListingCatalogue {
   ListingFormAttributes           AttributeItem[]
   BusinessQuotationFormAttributes AttributeItem[]
   RFQFormAttributes               AttributeItem[]
+  NegotiationAttributes           AttributeItem[]
 
   BussinessListings BussinessListing[]
   createdAt         DateTime           @default(now())
@@ -129,6 +144,31 @@ enum AttributeContols {
   isPhone
   isNumber
 }
+
+// cart 
+
+model cart {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  // userId String @db.ObjectId
+  // items CartItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  isDeleted Boolean @default(false)
+}
+
+model CartItem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  BussinessListingId String @db.ObjectId
+  // BussinessListing ListingCatalogue @relation(fields: [BussinessListingId], references: [id])
+  quantity Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// orders
+
+// payments - common for all
 
 model User {
   id               String  @id @default(auto()) @map("_id") @db.ObjectId
