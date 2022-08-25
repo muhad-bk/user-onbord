@@ -145,17 +145,15 @@ enum AttributeContols {
 // cart 
 
 model cart {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  bussiness Business @relation(fields: [businessId], references: [id]) // buyer
-  businessId String     @db.ObjectId 
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  bussiness  Business @relation(fields: [businessId], references: [id]) // buyer
+  businessId String   @db.ObjectId
 
-
-  items      CartItem[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  isActive   Boolean    @default(true)
-  isDeleted  Boolean    @default(false)
-  
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  isActive  Boolean    @default(true)
+  isDeleted Boolean    @default(false)
 }
 
 model CartItem {
@@ -163,11 +161,17 @@ model CartItem {
   BussinessListingId  String            @db.ObjectId
   BusinessQuotation   BusinessQuotation @relation(fields: [businessQuotationId], references: [id])
   quantity            Int
+  deliveryDate        DateTime
+  price               Float
+  // add cart mandatory items
+
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
   businessQuotationId String            @db.ObjectId
   cart                cart?             @relation(fields: [cartId], references: [id])
-  cartId              String?           @db.ObjectId
+  cartId              String?           @db.ObjectId      
+  Invoice             Invoice?          @relation(fields: [invoiceId], references: [id])
+  invoiceId           String?           @db.ObjectId
 }
 
 // orders
@@ -348,6 +352,7 @@ model Invoice {
   invoiceStatus      InvoiceStatus
   paymentStatus      PaymentStatus
   transactionDetails TransactionDetail[]
+  cartItems          CartItem[]
 
   //** invoice items */
   subscriptions PaymentSubscription[] @relation("invoices")
