@@ -39,9 +39,9 @@ model RFQ {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   AttributesValues AttributeWithValues[]
-  Attributes          AttributeItem[]
+  Attributes       AttributeItem[]
   // Quotation user/ bussiness info
-  businessId String                @db.ObjectId
+  businessId       String                @db.ObjectId
 
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
@@ -49,13 +49,18 @@ model RFQ {
   isDeleted          Boolean           @default(false)
   BussinessListing   BussinessListing? @relation(fields: [bussinessListingId], references: [id])
   bussinessListingId String?           @db.ObjectId
+
+  businessQuotations BusinessQuotation[]
+  newRFQ             RFQ                 @relation("recurciveRFQ", fields: [newRFQId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  newRFQId           String              @unique @db.ObjectId
+  oldRFQ             RFQ?                @relation("recurciveRFQ")
 }
 
 model BusinessQuotation {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   AttributesValues AttributeWithValues[]
-  Attributes          AttributeItem[]
+  Attributes       AttributeItem[]
 
   // Quotation user/ bussiness info
   businessId String @db.ObjectId
@@ -67,17 +72,9 @@ model BusinessQuotation {
   BussinessListing   BussinessListing? @relation(fields: [bussinessListingId], references: [id])
   bussinessListingId String?           @db.ObjectId
 
-  Negotiations Negotiations[]
-}
-
-model Negotiations {
-  id                  String                @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt           DateTime              @default(now())
-  isFinal             Boolean               @default(false)
-  Attributes          AttributeItem[]
-  AttributesValues    AttributeWithValues[]
-  BusinessQuotation   BusinessQuotation?    @relation(fields: [businessQuotationId], references: [id])
-  businessQuotationId String?               @db.ObjectId
+  RFQ      RFQ?       @relation(fields: [rFQId], references: [id])
+  rFQId    String?    @db.ObjectId
+  CartItem CartItem[]
 }
 
 model ListingCatalogue {
@@ -148,22 +145,29 @@ enum AttributeContols {
 // cart 
 
 model cart {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  // userId String @db.ObjectId
-  // items CartItem[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isActive Boolean @default(true)
-  isDeleted Boolean @default(false)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  bussiness Business @relation(fields: [businessId], references: [id]) // buyer
+  businessId String     @db.ObjectId 
+
+
+  items      CartItem[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  isActive   Boolean    @default(true)
+  isDeleted  Boolean    @default(false)
+  
 }
 
 model CartItem {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  BussinessListingId String @db.ObjectId
-  // BussinessListing ListingCatalogue @relation(fields: [BussinessListingId], references: [id])
-  quantity Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  BussinessListingId  String            @db.ObjectId
+  BusinessQuotation   BusinessQuotation @relation(fields: [businessQuotationId], references: [id])
+  quantity            Int
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  businessQuotationId String            @db.ObjectId
+  cart                cart?             @relation(fields: [cartId], references: [id])
+  cartId              String?           @db.ObjectId
 }
 
 // orders
@@ -256,6 +260,7 @@ model Business {
   emdWalletCurrentAmount Float
   transactions           TransactionDetail[]
   tradeLeads             TradeLeadEmdWallets[]
+  cart                   cart[]
 
   @@unique([createdById, defaultBusiness(true)])
 }
