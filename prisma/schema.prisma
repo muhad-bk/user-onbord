@@ -369,8 +369,7 @@ model Invoice {
   //** Invoice relations */
   Business         Business?       @relation("business_invoices", fields: [businessId], references: [id])
   businessId       String?         @db.ObjectId
-  TradeExecution   TradeExecution? @relation(fields: [tradeExecutionId], references: [id])
-  tradeExecutionId String?         @db.ObjectId
+ 
 }
 
 model PaymentSubscription {
@@ -667,7 +666,7 @@ model TradeExecution {
   CommodityPrice      Float
   paymentStatus       String
   TradeQuantity       Float
-  paymentInvoices     Invoice[]
+  paymentInvoices     String[] // Invoices Array
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -918,6 +917,7 @@ enum InvoiceType {
   SellOffer
   Topup
   Subscription
+  BusinessQuoteOrder
 }
 
 enum emdUnit {
